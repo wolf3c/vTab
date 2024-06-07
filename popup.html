@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>vtab</title>
+  <style>
+    body {
+      width: 300px;
+      height: 200px;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      margin: 0;
+      padding: 10px;
+      background-color: #f1f1f1;
+      border-bottom: 1px solid #ccc;
+    }
+    #pin-toggle {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      text-align: center;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #pin-toggle:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>vtab Extension</h1>
+  <button id="pin-toggle">Toggle Pin</button>
+  <script src="popup.js"></script>
+</body>
+</html>
