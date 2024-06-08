@@ -14,8 +14,11 @@ function createSidebar() {
   sidebar.style.overflowY = 'auto'; // Ensure vertical scrolling if content overflows
 
   sidebar.addEventListener('mouseenter', () => {
-    sidebar.style.width = '250px';
-    sidebar.style.boxShadow = '2px 0 5px rgba(0,0,0,0.2)'; // Add shadow effect
+    const isPinned = sidebar.getAttribute('data-pinned') === 'true';
+    if (!isPinned) {
+      sidebar.style.width = '250px';
+      sidebar.style.boxShadow = '2px 0 5px rgba(0,0,0,0.2)'; // Add shadow effect
+    }
   });
   sidebar.addEventListener('mouseleave', handleMouseLeave);
 
@@ -102,10 +105,12 @@ function togglePin() {
     sidebar.setAttribute('data-pinned', 'false');
     sidebar.style.width = '10px';
     sidebar.style.boxShadow = 'none'; // Remove shadow effect
+    document.body.style.marginLeft = '0'; // Reset body margin
   } else {
     sidebar.setAttribute('data-pinned', 'true');
     sidebar.style.width = '250px';
     sidebar.style.boxShadow = '2px 0 5px rgba(0,0,0,0.2)'; // Add shadow effect
+    document.body.style.marginLeft = '250px'; // Adjust body margin to make room for sidebar
   }
 }
 
