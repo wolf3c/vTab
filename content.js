@@ -10,7 +10,7 @@ function createSidebar() {
     sidebar.style.height = '100%';
     sidebar.style.backgroundColor = '#f7f7f7'; // Set light gray background
     sidebar.style.transition = 'width 0.3s, box-shadow 0.3s';
-    sidebar.style.zIndex = '1000';
+    sidebar.style.zIndex = '2147483647';
     sidebar.style.overflowY = 'auto'; // Ensure vertical scrolling if content overflows
 
     sidebar.addEventListener('mouseenter', () => {
