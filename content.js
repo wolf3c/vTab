@@ -40,6 +40,28 @@ function createSidebar() {
     operationArea.appendChild(pinButton);
     sidebar.appendChild(operationArea);
 
+    // Create search input
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Search tabs...';
+    searchInput.style.width = 'calc(100% - 14px)';
+    searchInput.style.padding = '5px';
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const tabItems = Array.from(tabList.children);
+        tabItems.forEach(item => {
+            const tabTitle = item.textContent.toLowerCase();
+            if (tabTitle.includes(searchTerm)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+
+    sidebar.appendChild(searchInput);
+
+    // Create tab list
     const tabList = document.createElement('ul');
     tabList.id = 'vtab-list';
     tabList.style.listStyle = 'none'; // Remove bullet points
@@ -106,7 +128,26 @@ function updateTabList() {
 
         tabs.forEach(tab => {
             const listItem = document.createElement('li');
-            listItem.textContent = tab.title;
+            listItem.style.display = 'flex'; // Use flexbox for alignment
+            listItem.style.alignItems = 'center'; // Align items vertically
+
+            const favicon = tab.favIconUrl; // Get favicon URL from tab data
+            if (favicon) {
+                const faviconImg = document.createElement('img');
+                faviconImg.src = favicon;
+                faviconImg.style.width = '16px'; // Set width of favicon image
+                faviconImg.style.height = '16px'; // Set height of favicon image
+                faviconImg.style.marginRight = '8px'; // Add right margin for spacing
+                listItem.appendChild(faviconImg); // Add favicon image to list item
+            }
+
+            const titleSpan = document.createElement('span');
+            titleSpan.textContent = tab.title;
+            titleSpan.style.flex = '1'; // Allow title to grow and take up remaining space
+            titleSpan.style.overflow = 'hidden'; // Hide overflow text
+            titleSpan.style.textOverflow = 'ellipsis'; // Add ellipsis for long titles
+            listItem.appendChild(titleSpan);
+
             listItem.style.padding = '10px'; // Add padding for list item
             listItem.style.cursor = 'pointer';
             listItem.style.whiteSpace = 'nowrap';
