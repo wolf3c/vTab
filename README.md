@@ -9,15 +9,15 @@ It will not have any impact on your current browsing experience.
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Mc_RFd1lTcI/0.jpg)](https://www.youtube.com/watch?v=Mc_RFd1lTcI)
 
-List of features:
+**List of features**:
 - [x] manage tabs(check, switch, close) in sidebar smoothly;
 - [x] pin vtab sidebar;
 - [x] search tabs;
 
 
-# Install
+# How to install
 
-[Chrome web store](https://chromewebstore.google.com/detail/vtab/fkmcgnjikengcgbeadhmdeneagpdgaea) 
+[Chrome web store](https://chromewebstore.google.com/detail/vtab/fkmcgnjikengcgbeadhmdeneagpdgaea){:target="_blank"} 
 
 # Why develop this new vertical tab manager?
 
@@ -28,6 +28,6 @@ There are three reasons why I develop this Chrome extension:
 3. finally, AI empowered my technique. I asked GPT build the first version of vTab in 1hour 52mins.
 
 # ❤️ Support Me
-<a href="https://www.buymeacoffee.com/wolf3cg">
+<a href="https://www.buymeacoffee.com/wolf3cg" target="_blank">
 <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" width="160" alt="buymeacoffee" />
 </a>
