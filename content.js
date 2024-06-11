@@ -32,7 +32,7 @@ function createSidebar() {
 
     // Create '❤️ Support Me' button
     const supportButton = document.createElement('button');
-    supportButton.textContent = '❤️ Support Me';
+    supportButton.textContent = '❤️ Support';
     supportButton.style.cursor = 'pointer';
     supportButton.addEventListener('click', () => {
         window.open('https://www.buymeacoffee.com/wolf3cg', '_blank');
