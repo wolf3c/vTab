@@ -7,6 +7,8 @@ You can manage browser tabs in the sidebar as fast as lightning.
 
 It will not have any impact on your current browsing experience.
 
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Mc_RFd1lTcI/0.jpg)](https://www.youtube.com/watch?v=Mc_RFd1lTcI)
+
 
 # Install
 
