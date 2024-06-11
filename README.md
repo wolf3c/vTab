@@ -27,3 +27,7 @@ There are three reasons why I develop this Chrome extension:
 2. then, there are so many tabs manager extensions I found, but they used Chrome side panel technique. The operation of toggling the side panel is not smooth. And the minimal width of side panel takes a lot of space.
 3. finally, AI empowered my technique. I asked GPT build the first version of vTab in 1hour 52mins.
 
+# ❤️ Support Me
+<a href="https://www.buymeacoffee.com/wolf3cg">
+<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" width="160" alt="buymeacoffee" />
+</a>
