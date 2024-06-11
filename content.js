@@ -198,6 +198,8 @@ function updateTabList() {
 function togglePin() {
     const sidebar = document.getElementById('vtab-sidebar');
     const isPinned = sidebar.getAttribute('data-pinned') === 'true';
+    const pinButton = document.getElementById('pin-toggle');
+    pinButton.textContent = isPinned ? '📌 Pin' : '📌 Unpin';
 
     if (isPinned) {
         sidebar.setAttribute('data-pinned', 'false');
