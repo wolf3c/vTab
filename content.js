@@ -30,16 +30,36 @@ function createSidebar() {
     operationArea.style.padding = '10px';
     operationArea.style.borderBottom = '1px solid #ccc';
 
+    // Create '❤️ Support Me' button
+    const supportButton = document.createElement('button');
+    supportButton.textContent = '❤️ Support Me';
+    supportButton.style.cursor = 'pointer';
+    supportButton.addEventListener('click', () => {
+        window.open('https://www.buymeacoffee.com/wolf3cg', '_blank');
+    });
+    operationArea.appendChild(supportButton);
+    sidebar.appendChild(operationArea);
+
+    // Create 'github' button
+    const githubButton = document.createElement('button');
+    githubButton.textContent = '🏚️ Github';
+    githubButton.style.cursor = 'pointer';
+    githubButton.addEventListener('click', () => {
+        window.open('https://github.com/wolf3c/vTab', '_blank');
+    });
+    operationArea.appendChild(githubButton);
+    sidebar.appendChild(operationArea);
+
     // Create the pin button
     const pinButton = document.createElement('button');
     pinButton.id = 'pin-toggle';
-    pinButton.textContent = 'Pin';
+    pinButton.textContent = '📌Pin';
     pinButton.style.cursor = 'pointer';
     pinButton.addEventListener('click', togglePin);
 
     operationArea.appendChild(pinButton);
     sidebar.appendChild(operationArea);
-
+    
     // Create search input
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
