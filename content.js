@@ -1,14 +1,31 @@
 console.log('content.js loaded');
 
+// const host = document.body.appendChild(document.createElement('div'));
+const host = document.createElement('div');
+host.id = 'vtab-host';
+document.body.appendChild(host);
+
 function createSidebar() {
+    const shadow = host.attachShadow({ mode: 'open' });
+
+    shadow.innerHTML = `
+<style>
+    /* 重置 Shadow DOM 内部样式，避免继承外部样式 */
+    :host {
+        all: initial;
+    }
+</style>
+`;
+
     const sidebar = document.createElement('div');
     sidebar.id = 'vtab-sidebar';
     sidebar.style.position = 'fixed';
-    sidebar.style.left = '0';
+    sidebar.style.left = '-240px';
     sidebar.style.top = '0';
-    sidebar.style.width = '10px';
+    sidebar.style.width = '250px';
     sidebar.style.height = '100%';
     sidebar.style.backgroundColor = '#f7f7f7'; // Set light gray background
+    sidebar.style.boxShadow = '2px 0 5px rgba(0,0,0,0.2)'; // Add shadow effect
     sidebar.style.transition = 'width 0.3s, box-shadow 0.3s';
     sidebar.style.zIndex = '2147483647';
     sidebar.style.overflowY = 'auto'; // Ensure vertical scrolling if content overflows
@@ -16,11 +33,17 @@ function createSidebar() {
     sidebar.addEventListener('mouseenter', () => {
         const isPinned = sidebar.getAttribute('data-pinned') === 'true';
         if (!isPinned) {
-            sidebar.style.width = '250px';
-            sidebar.style.boxShadow = '2px 0 5px rgba(0,0,0,0.2)'; // Add shadow effect
+            // sidebar.style.width = '250px';
+            // sidebar.style.boxShadow = '2px 0 5px rgba(0,0,0,0.2)'; // Add shadow effect
+            sidebar.style.left = '0';
         }
     });
-    sidebar.addEventListener('mouseleave', handleMouseLeave);
+    sidebar.addEventListener('mouseleave', () => {
+        const isPinned = sidebar.getAttribute('data-pinned') === 'true';
+        if (!isPinned) {
+            sidebar.style.left = '-240px';
+        }
+    });
 
     // Create the operation area at the top
     const operationArea = document.createElement('div');
@@ -55,11 +78,22 @@ function createSidebar() {
     pinButton.id = 'pin-toggle';
     pinButton.textContent = '📌Pin';
     pinButton.style.cursor = 'pointer';
-    pinButton.addEventListener('click', togglePin);
+    pinButton.addEventListener('click', () => {
+        const isPinned = sidebar.getAttribute('data-pinned') === 'true';
+        pinButton.textContent = isPinned ? '📌 Pin' : '📌 Unpin';
+
+        if (isPinned) {
+            sidebar.setAttribute('data-pinned', 'false');
+            document.body.style.marginLeft = '0'; // Reset body margin
+        } else {
+            sidebar.setAttribute('data-pinned', 'true');
+            document.body.style.marginLeft = '250px'; // Adjust body margin to make room for sidebar
+        }
+    });
 
     operationArea.appendChild(pinButton);
     sidebar.appendChild(operationArea);
-    
+
     // Create search input
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
@@ -90,60 +124,17 @@ function createSidebar() {
     tabList.style.textAlign = 'left'; // Ensure left alignment
     sidebar.appendChild(tabList);
 
-    document.body.appendChild(sidebar);
+    // document.body.appendChild(sidebar);
+
+    shadow.appendChild(sidebar);
     console.log('Sidebar created');
 }
 
-function handleMouseLeave() {
-    const sidebar = document.getElementById('vtab-sidebar');
-    if (sidebar) {
-        const isPinned = sidebar.getAttribute('data-pinned') === 'true';
-        if (!isPinned) {
-            sidebar.style.width = '10px';
-            sidebar.style.boxShadow = 'none'; // Remove shadow effect
-        }
-    }
-}
-
-function addCloseButton(listItem) {
-    const closeButton = document.createElement('button');
-    closeButton.textContent = 'X';
-    closeButton.style.position = 'absolute';
-    closeButton.style.right = '5px'; // 调整关闭按钮到右侧
-    closeButton.style.width = '20px';
-    closeButton.style.height = '20px';
-    closeButton.style.cursor = 'pointer';
-    closeButton.style.backgroundColor = 'black';
-    closeButton.style.color = 'white';
-    closeButton.style.border = 'none';
-    closeButton.style.borderRadius = '50%';
-
-    closeButton.style.top = '50%'; // 垂直居中
-    closeButton.style.transform = 'translateY(-50%)'; // 通过transform垂直居中
-    closeButton.style.display = 'none'; // 初始隐藏关闭按钮
-
-    closeButton.addEventListener('click', (event) => {
-        event.stopPropagation(); // 防止点击关闭按钮时激活标签
-        const tabId = parseInt(listItem.dataset.tabId);
-        chrome.runtime.sendMessage({ action: 'closeTab', tabId: tabId });
-    });
-
-    listItem.style.position = 'relative'; // 设置父级列表项的位置为相对定位
-    listItem.appendChild(closeButton);
-
-    listItem.addEventListener('mouseenter', () => {
-        closeButton.style.display = 'block';
-    });
-
-    listItem.addEventListener('mouseleave', () => {
-        closeButton.style.display = 'none';
-    });
-}
 
 function updateTabList() {
     chrome.storage.local.get('tabs', (data) => {
         const tabs = data.tabs || [];
-        const tabList = document.getElementById('vtab-list');
+        const tabList = host.shadowRoot.getElementById('vtab-list');
         tabList.innerHTML = '';
 
         tabs.forEach(tab => {
@@ -177,6 +168,7 @@ function updateTabList() {
             listItem.style.fontSize = '16px'; // Increase font size
             listItem.style.backgroundColor = '#f7f7f7'; // Set background color for list item
             listItem.style.borderRadius = '5px'; // Add slight border radius for list items
+            listItem.style.lineHeight = '28px'; // Set line height for list items
             listItem.dataset.tabId = tab.id;
 
             if (tab.active) {
@@ -193,26 +185,43 @@ function updateTabList() {
             tabList.appendChild(listItem);
         });
     });
-}
 
-function togglePin() {
-    const sidebar = document.getElementById('vtab-sidebar');
-    const isPinned = sidebar.getAttribute('data-pinned') === 'true';
-    const pinButton = document.getElementById('pin-toggle');
-    pinButton.textContent = isPinned ? '📌 Pin' : '📌 Unpin';
+    function addCloseButton(listItem) {
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'X';
+        closeButton.style.position = 'absolute';
+        closeButton.style.right = '5px'; // 调整关闭按钮到右侧
+        closeButton.style.width = '20px';
+        closeButton.style.height = '20px';
+        closeButton.style.cursor = 'pointer';
+        closeButton.style.backgroundColor = 'black';
+        closeButton.style.color = 'white';
+        closeButton.style.border = 'none';
+        closeButton.style.borderRadius = '50%';
 
-    if (isPinned) {
-        sidebar.setAttribute('data-pinned', 'false');
-        sidebar.style.width = '10px';
-        sidebar.style.boxShadow = 'none'; // Remove shadow effect
-        document.body.style.marginLeft = '0'; // Reset body margin
-    } else {
-        sidebar.setAttribute('data-pinned', 'true');
-        sidebar.style.width = '250px';
-        sidebar.style.boxShadow = '2px 0 5px rgba(0,0,0,0.2)'; // Add shadow effect
-        document.body.style.marginLeft = '250px'; // Adjust body margin to make room for sidebar
+        closeButton.style.top = '50%'; // 垂直居中
+        closeButton.style.transform = 'translateY(-50%)'; // 通过transform垂直居中
+        closeButton.style.display = 'none'; // 初始隐藏关闭按钮
+
+        closeButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // 防止点击关闭按钮时激活标签
+            const tabId = parseInt(listItem.dataset.tabId);
+            chrome.runtime.sendMessage({ action: 'closeTab', tabId: tabId });
+        });
+
+        listItem.style.position = 'relative'; // 设置父级列表项的位置为相对定位
+        listItem.appendChild(closeButton);
+
+        listItem.addEventListener('mouseenter', () => {
+            closeButton.style.display = 'block';
+        });
+
+        listItem.addEventListener('mouseleave', () => {
+            closeButton.style.display = 'none';
+        });
     }
 }
+
 
 // Initialize sidebar on page load
 createSidebar();
