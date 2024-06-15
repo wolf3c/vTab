@@ -72,6 +72,11 @@ function createSidebar() {
         background-color: #e0e0e0;
     }
 
+    .vtab-list-item.discarded {
+        filter: grayscale(100%);
+        opacity: 0.5;
+    }
+
     .vtab-list-item img {
         width: 16px;
         height: 16px;
@@ -215,6 +220,7 @@ function updateTabList() {
                     console.log('Tab:', tab);
                     const listItem = document.createElement('li');
                     listItem.className = 'vtab-list-item';
+                    listItem.className += tab.discarded ? ' discarded' : '';
 
                     const favicon = tab.favIconUrl; // Get favicon URL from tab data
                     console.log('favicon: ', favicon)
