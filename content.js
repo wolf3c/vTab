@@ -74,7 +74,7 @@ function createSidebar() {
 
     .vtab-list-item.discarded {
         filter: grayscale(100%);
-        opacity: 0.5;
+        opacity: 0.4;
     }
 
     .vtab-list-item img {
