@@ -251,6 +251,11 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
             console.error('无法获取窗口ID');
         }
     })
+});
 
-
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    if (message === 'reloadContentScript') {
+        // 这里可以执行任何你想要的重新初始化逻辑
+        window.location.reload();
+    }
 });

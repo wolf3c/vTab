@@ -1,7 +1,23 @@
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener(function (details) {
     console.log("vtab extension installed.");
+
     updateTabsInStorage();
+
+    // register content script when extension is updated
+    if (details.reason === 'update') {
+        chrome.tabs.query({}, function (tabs) {
+            for (let i = 0; i < tabs.length; i++) {
+                if (tabs[i].discarded === false && tabs[i].status === "complete") {
+                    chrome.scripting.executeScript({
+                        target: { tabId: tabs[i].id },
+                        files: ['content.js']
+                    });
+                }
+            }
+        });
+    }
 });
+
 
 function updateTabsInStorage() {
     chrome.windows.getAll({ populate: true }, (windows) => {
