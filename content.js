@@ -1,6 +1,5 @@
 console.log('content.js loaded');
 
-// const host = document.body.appendChild(document.createElement('div'));
 const host = document.createElement('div');
 host.id = 'vtab-host';
 document.body.appendChild(host);
@@ -132,59 +131,70 @@ function createSidebar() {
 
 
 function updateTabList() {
-    chrome.storage.local.get('tabs', (data) => {
-        const tabs = data.tabs || [];
-        const tabList = host.shadowRoot.getElementById('vtab-list');
-        tabList.innerHTML = '';
+    // 向后台脚本发送消息以获取当前窗口 ID
+    chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
+        if (response && response.windowId !== undefined) {
+            console.log('当前窗口的ID是：', response.windowId);
+            // 你可以在这里执行其他操作
+            chrome.storage.local.get('tabs_' + response.windowId, (data) => {
+                console.log(data)
+                const tabs = data['tabs_' + response.windowId] || [];
+                const tabList = host.shadowRoot.getElementById('vtab-list');
+                tabList.innerHTML = '';
 
-        tabs.forEach(tab => {
-            const listItem = document.createElement('li');
-            listItem.style.display = 'flex'; // Use flexbox for alignment
-            listItem.style.alignItems = 'center'; // Align items vertically
+                tabs.forEach(tab => {
+                    const listItem = document.createElement('li');
+                    listItem.style.display = 'flex'; // Use flexbox for alignment
+                    listItem.style.alignItems = 'center'; // Align items vertically
 
-            const favicon = tab.favIconUrl; // Get favicon URL from tab data
-            if (favicon) {
-                const faviconImg = document.createElement('img');
-                faviconImg.src = favicon;
-                faviconImg.style.width = '16px'; // Set width of favicon image
-                faviconImg.style.height = '16px'; // Set height of favicon image
-                faviconImg.style.marginRight = '8px'; // Add right margin for spacing
-                listItem.appendChild(faviconImg); // Add favicon image to list item
-            }
+                    const favicon = tab.favIconUrl; // Get favicon URL from tab data
+                    if (favicon) {
+                        const faviconImg = document.createElement('img');
+                        faviconImg.src = favicon;
+                        faviconImg.style.width = '16px'; // Set width of favicon image
+                        faviconImg.style.height = '16px'; // Set height of favicon image
+                        faviconImg.style.marginRight = '8px'; // Add right margin for spacing
+                        listItem.appendChild(faviconImg); // Add favicon image to list item
+                    }
 
-            const titleSpan = document.createElement('span');
-            titleSpan.textContent = tab.title;
-            titleSpan.style.flex = '1'; // Allow title to grow and take up remaining space
-            titleSpan.style.overflow = 'hidden'; // Hide overflow text
-            titleSpan.style.textOverflow = 'ellipsis'; // Add ellipsis for long titles
-            listItem.appendChild(titleSpan);
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = tab.title;
+                    titleSpan.style.flex = '1'; // Allow title to grow and take up remaining space
+                    titleSpan.style.overflow = 'hidden'; // Hide overflow text
+                    titleSpan.style.textOverflow = 'ellipsis'; // Add ellipsis for long titles
+                    listItem.appendChild(titleSpan);
 
-            listItem.style.padding = '10px'; // Add padding for list item
-            listItem.style.cursor = 'pointer';
-            listItem.style.whiteSpace = 'nowrap';
-            listItem.style.overflow = 'hidden';
-            listItem.style.textOverflow = 'ellipsis';
-            listItem.style.margin = '5px 10px'; // Add margin between list items, ensure left alignment with margin
-            listItem.style.fontSize = '16px'; // Increase font size
-            listItem.style.backgroundColor = '#f7f7f7'; // Set background color for list item
-            listItem.style.borderRadius = '5px'; // Add slight border radius for list items
-            listItem.style.lineHeight = '28px'; // Set line height for list items
-            listItem.dataset.tabId = tab.id;
+                    listItem.style.padding = '10px'; // Add padding for list item
+                    listItem.style.cursor = 'pointer';
+                    listItem.style.whiteSpace = 'nowrap';
+                    listItem.style.overflow = 'hidden';
+                    listItem.style.textOverflow = 'ellipsis';
+                    listItem.style.margin = '5px 10px'; // Add margin between list items, ensure left alignment with margin
+                    listItem.style.fontSize = '16px'; // Increase font size
+                    listItem.style.backgroundColor = '#f7f7f7'; // Set background color for list item
+                    listItem.style.borderRadius = '5px'; // Add slight border radius for list items
+                    listItem.style.lineHeight = '28px'; // Set line height for list items
+                    listItem.dataset.tabId = tab.id;
 
-            if (tab.active) {
-                listItem.style.backgroundColor = '#ddd';
-            }
+                    if (tab.active) {
+                        listItem.style.backgroundColor = '#ddd';
+                    }
 
-            listItem.addEventListener('click', () => {
-                console.log('Tab item clicked', listItem.dataset.tabId);
-                chrome.runtime.sendMessage({ action: 'activateTab', tabId: parseInt(listItem.dataset.tabId) });
+                    listItem.addEventListener('click', () => {
+                        console.log('Tab item clicked', listItem.dataset.tabId);
+                        chrome.runtime.sendMessage({ action: 'activateTab', tabId: parseInt(listItem.dataset.tabId) });
+                    });
+
+                    addCloseButton(listItem); // Add close button to each tab item
+
+                    tabList.appendChild(listItem);
+                });
             });
+        } else {
+            console.error('无法获取窗口ID');
+        }
+    })
 
-            addCloseButton(listItem); // Add close button to each tab item
-
-            tabList.appendChild(listItem);
-        });
-    });
 
     function addCloseButton(listItem) {
         const closeButton = document.createElement('button');
@@ -229,7 +239,18 @@ updateTabList();
 
 // Update tab list when tabs change
 chrome.storage.onChanged.addListener((changes, namespace) => {
-    if (changes.tabs) {
-        updateTabList();
-    }
+    // 向后台脚本发送消息以获取当前窗口 ID
+    chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
+        if (response && response.windowId !== undefined) {
+            console.log('当前窗口的ID是：', response.windowId);
+            // 你可以在这里执行其他操作
+            if (changes['tabs_' + response.windowId]) {
+                updateTabList();
+            }
+        } else {
+            console.error('无法获取窗口ID');
+        }
+    })
+
+
 });
