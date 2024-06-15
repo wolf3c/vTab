@@ -2,6 +2,7 @@ console.log('content.js loaded');
 
 const host = document.createElement('div');
 host.id = 'vtab-host';
+host.className = 'vtab-host';
 document.body.appendChild(host);
 
 function createSidebar() {
@@ -13,27 +14,107 @@ function createSidebar() {
     :host {
         all: initial;
     }
+
+    #vtab-sidebar {
+        position: fixed;
+        top: 0;
+        left: -240px;
+        width: 250px;
+        height: 100%;
+        background-color: #f7f7f7; /* Set light gray background */
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Add shadow effect */
+        transition: width 0.3s, box-shadow 0.3s;
+        z-index: 2147483647;
+        overflow-y: auto; /* Ensure vertical scrolling if content overflows */
+    }
+    
+    #operation-area {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+    #operation-area button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    #search-input {
+        width: calc(100% - 14px);
+        padding: 5px;
+    }
+
+    #vtab-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        textAlign: left;
+    }
+    
+    .vtab-list-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 5px 10px;
+        font-size: 16px;
+        background-color: #f7f7f7;
+        border-radius: 5px;
+        line-height: 28px;
+    }
+    .vtab-list-item:hover {
+        background-color: #e0e0e0;
+    }
+
+    .vtab-list-item img {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+    }
+    .vtab-list-item span {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .vtab-list-item button {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        background-color: black;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+    }
+    .vtab-list-item:hover button {
+        display: block;
+    }
+
+    .close-button {
+        right: 6px;
+    }
+    .discard-button {
+        left: 6px;
+    }
 </style>
 `;
 
     const sidebar = document.createElement('div');
     sidebar.id = 'vtab-sidebar';
-    sidebar.style.position = 'fixed';
-    sidebar.style.left = '-240px';
-    sidebar.style.top = '0';
-    sidebar.style.width = '250px';
-    sidebar.style.height = '100%';
-    sidebar.style.backgroundColor = '#f7f7f7'; // Set light gray background
-    sidebar.style.boxShadow = '2px 0 5px rgba(0,0,0,0.2)'; // Add shadow effect
-    sidebar.style.transition = 'width 0.3s, box-shadow 0.3s';
-    sidebar.style.zIndex = '2147483647';
-    sidebar.style.overflowY = 'auto'; // Ensure vertical scrolling if content overflows
 
     sidebar.addEventListener('mouseenter', () => {
         const isPinned = sidebar.getAttribute('data-pinned') === 'true';
         if (!isPinned) {
-            // sidebar.style.width = '250px';
-            // sidebar.style.boxShadow = '2px 0 5px rgba(0,0,0,0.2)'; // Add shadow effect
             sidebar.style.left = '0';
         }
     });
@@ -46,16 +127,11 @@ function createSidebar() {
 
     // Create the operation area at the top
     const operationArea = document.createElement('div');
-    operationArea.style.display = 'flex';
-    operationArea.style.justifyContent = 'space-between';
-    operationArea.style.alignItems = 'center';
-    operationArea.style.padding = '10px';
-    operationArea.style.borderBottom = '1px solid #ccc';
+    operationArea.id = 'operation-area';
 
     // Create '❤️ Support Me' button
     const supportButton = document.createElement('button');
     supportButton.textContent = '❤️ Support';
-    supportButton.style.cursor = 'pointer';
     supportButton.addEventListener('click', () => {
         window.open('https://www.buymeacoffee.com/wolf3cg', '_blank');
     });
@@ -65,7 +141,6 @@ function createSidebar() {
     // Create 'github' button
     const githubButton = document.createElement('button');
     githubButton.textContent = '🏚️ Github';
-    githubButton.style.cursor = 'pointer';
     githubButton.addEventListener('click', () => {
         window.open('https://github.com/wolf3c/vTab', '_blank');
     });
@@ -76,7 +151,6 @@ function createSidebar() {
     const pinButton = document.createElement('button');
     pinButton.id = 'pin-toggle';
     pinButton.textContent = '📌Pin';
-    pinButton.style.cursor = 'pointer';
     pinButton.addEventListener('click', () => {
         const isPinned = sidebar.getAttribute('data-pinned') === 'true';
         pinButton.textContent = isPinned ? '📌 Pin' : '📌 Unpin';
@@ -95,10 +169,9 @@ function createSidebar() {
 
     // Create search input
     const searchInput = document.createElement('input');
+    searchInput.id = 'search-input';
     searchInput.type = 'text';
     searchInput.placeholder = 'Search tabs...';
-    searchInput.style.width = 'calc(100% - 14px)';
-    searchInput.style.padding = '5px';
     searchInput.addEventListener('input', () => {
         const searchTerm = searchInput.value.toLowerCase();
         const tabItems = Array.from(tabList.children);
@@ -117,10 +190,6 @@ function createSidebar() {
     // Create tab list
     const tabList = document.createElement('ul');
     tabList.id = 'vtab-list';
-    tabList.style.listStyle = 'none'; // Remove bullet points
-    tabList.style.padding = '10px 0'; // Add padding for list
-    tabList.style.margin = '0'; // Remove default margin
-    tabList.style.textAlign = 'left'; // Ensure left alignment
     sidebar.appendChild(tabList);
 
     // document.body.appendChild(sidebar);
@@ -143,37 +212,22 @@ function updateTabList() {
                 tabList.innerHTML = '';
 
                 tabs.forEach(tab => {
+                    console.log('Tab:', tab);
                     const listItem = document.createElement('li');
-                    listItem.style.display = 'flex'; // Use flexbox for alignment
-                    listItem.style.alignItems = 'center'; // Align items vertically
+                    listItem.className = 'vtab-list-item';
 
                     const favicon = tab.favIconUrl; // Get favicon URL from tab data
+                    console.log('favicon: ', favicon)
                     if (favicon) {
                         const faviconImg = document.createElement('img');
                         faviconImg.src = favicon;
-                        faviconImg.style.width = '16px'; // Set width of favicon image
-                        faviconImg.style.height = '16px'; // Set height of favicon image
-                        faviconImg.style.marginRight = '8px'; // Add right margin for spacing
                         listItem.appendChild(faviconImg); // Add favicon image to list item
                     }
 
                     const titleSpan = document.createElement('span');
                     titleSpan.textContent = tab.title;
-                    titleSpan.style.flex = '1'; // Allow title to grow and take up remaining space
-                    titleSpan.style.overflow = 'hidden'; // Hide overflow text
-                    titleSpan.style.textOverflow = 'ellipsis'; // Add ellipsis for long titles
                     listItem.appendChild(titleSpan);
 
-                    listItem.style.padding = '10px'; // Add padding for list item
-                    listItem.style.cursor = 'pointer';
-                    listItem.style.whiteSpace = 'nowrap';
-                    listItem.style.overflow = 'hidden';
-                    listItem.style.textOverflow = 'ellipsis';
-                    listItem.style.margin = '5px 10px'; // Add margin between list items, ensure left alignment with margin
-                    listItem.style.fontSize = '16px'; // Increase font size
-                    listItem.style.backgroundColor = '#f7f7f7'; // Set background color for list item
-                    listItem.style.borderRadius = '5px'; // Add slight border radius for list items
-                    listItem.style.lineHeight = '28px'; // Set line height for list items
                     listItem.dataset.tabId = tab.id;
 
                     if (tab.active) {
@@ -186,6 +240,8 @@ function updateTabList() {
                     });
 
                     addCloseButton(listItem); // Add close button to each tab item
+                    addDiscardButton(listItem); 
+                    console.log(listItem)
 
                     tabList.appendChild(listItem);
                 });
@@ -198,20 +254,8 @@ function updateTabList() {
 
     function addCloseButton(listItem) {
         const closeButton = document.createElement('button');
+        closeButton.className = 'close-button';
         closeButton.textContent = 'X';
-        closeButton.style.position = 'absolute';
-        closeButton.style.right = '5px'; // 调整关闭按钮到右侧
-        closeButton.style.width = '20px';
-        closeButton.style.height = '20px';
-        closeButton.style.cursor = 'pointer';
-        closeButton.style.backgroundColor = 'black';
-        closeButton.style.color = 'white';
-        closeButton.style.border = 'none';
-        closeButton.style.borderRadius = '50%';
-
-        closeButton.style.top = '50%'; // 垂直居中
-        closeButton.style.transform = 'translateY(-50%)'; // 通过transform垂直居中
-        closeButton.style.display = 'none'; // 初始隐藏关闭按钮
 
         closeButton.addEventListener('click', (event) => {
             event.stopPropagation(); // 防止点击关闭按钮时激活标签
@@ -219,16 +263,39 @@ function updateTabList() {
             chrome.runtime.sendMessage({ action: 'closeTab', tabId: tabId });
         });
 
-        listItem.style.position = 'relative'; // 设置父级列表项的位置为相对定位
+        // listItem.style.position = 'relative'; // 设置父级列表项的位置为相对定位
         listItem.appendChild(closeButton);
 
-        listItem.addEventListener('mouseenter', () => {
-            closeButton.style.display = 'block';
+        // listItem.addEventListener('mouseenter', () => {
+        //     closeButton.style.display = 'block';
+        // });
+
+        // listItem.addEventListener('mouseleave', () => {
+        //     closeButton.style.display = 'none';
+        // });
+    }
+    
+    function addDiscardButton(listItem) {
+        const discardButton = document.createElement('button');
+        discardButton.className = 'discard-button';
+        discardButton.textContent = '️❅';
+
+        discardButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // 防止点击关闭按钮时激活标签
+            const tabId = parseInt(listItem.dataset.tabId);
+            chrome.runtime.sendMessage({ action: 'discardTab', tabId: tabId });
         });
 
-        listItem.addEventListener('mouseleave', () => {
-            closeButton.style.display = 'none';
-        });
+        // listItem.style.position = 'relative'; // 设置父级列表项的位置为相对定位
+        listItem.appendChild(discardButton);
+
+        // listItem.addEventListener('mouseenter', () => {
+        //     discardButton.style.display = 'block';
+        // });
+
+        // listItem.addEventListener('mouseleave', () => {
+        //     discardButton.style.display = 'none';
+        // });
     }
 }
 
