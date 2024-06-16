@@ -1,20 +1,32 @@
 # What is vTab
-**vTab is vertical tab manager for your browser.**
 
-> 给你的浏览器提供一个快如闪电的侧边栏
+**vTab is vertical tab manager for your browser.**
 
 You can manage browser tabs in the sidebar as fast as lightning.
 
 It will not have any impact on your current browsing experience.
 
+**feature list**: 
+- manage tabs(check, switch, close) in sidebar smoothly
+- pin the vTab sidebar;
+- search tabs;
+- freeze tabs & freeze all tabs in the window (free RAM of you PC);
+- create new tab;
+
+vTab 给你的浏览器提供一个快如闪电的**侧边栏标签页管理器**。
+
+并且，它不会影响你现在的浏览器使用体验。
+
+**功能列表**：
+- 在vTab侧边栏中管理标签页（检查、切换、关闭）
+- 固定vTab侧边栏；
+- 搜索标签页；
+- 冻结单个标签页和冻结窗口中的所有标签页（可释放内存）；
+- 创建新标签页；
+
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Mc_RFd1lTcI/0.jpg)](https://www.youtube.com/watch?v=Mc_RFd1lTcI)
 
-**List of features**:
-- [x] manage tabs(check, switch, close) in sidebar smoothly;
-- [x] pin vtab sidebar;
-- [x] search tabs;
-- [x] freeze tabs & freeze all tabs in the window;
-- [x] create new tab;
+**TODO**:
 - [ ] display pined tabs horizontal;
 - [ ] auto archive the tabs not opened long time;
 
