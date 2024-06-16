@@ -74,7 +74,7 @@ function createSidebar() {
 
     .vtab-list-item.discarded {
         filter: grayscale(100%);
-        opacity: 0.4;
+        opacity: 0.3;
     }
 
     .vtab-list-item img {
@@ -246,7 +246,7 @@ function updateTabList() {
                     });
 
                     addCloseButton(listItem); // Add close button to each tab item
-                    addDiscardButton(listItem); 
+                    if (!tab.discarded) addDiscardButton(listItem); 
                     console.log(listItem)
 
                     tabList.appendChild(listItem);
