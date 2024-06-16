@@ -14,6 +14,9 @@ It will not have any impact on your current browsing experience.
 - [x] pin vtab sidebar;
 - [x] search tabs;
 - [x] freeze tabs & freeze all tabs in the window;
+- [x] create new tab;
+- [ ] display pined tabs horizontal;
+- [ ] auto archive the tabs not opened long time;
 
 
 # How to install
