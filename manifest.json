@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "vtab",
     "description": "Vertical tab manager for your browser",
-    "version": "2.4",
+    "version": "2.5",
     "permissions": [
         "tabs",
         "storage",
@@ -40,5 +40,5 @@
         "48": "icons/icon48.png",
         "128": "icons/icon128.png"
     },
-    "isReleased": true 
+    "isReleased": true
 }
