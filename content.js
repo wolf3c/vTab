@@ -1,3 +1,7 @@
+if (chrome.runtime.getManifest().isReleased) {
+    console.log = function () { };
+}
+
 console.log('content.js loaded');
 
 const host = document.createElement('div');
@@ -134,13 +138,13 @@ function createSidebar() {
     const operationArea = document.createElement('div');
     operationArea.id = 'operation-area';
 
-    // Create '❤️ Support Me' button
-    const supportButton = document.createElement('button');
-    supportButton.textContent = '❤️ Support';
-    supportButton.addEventListener('click', () => {
-        window.open('https://www.buymeacoffee.com/wolf3cg', '_blank');
+    // Create '❅ Freeze All' button
+    const freezeAllButton = document.createElement('button');
+    freezeAllButton.textContent = '❅ Freeze All';
+    freezeAllButton.addEventListener('click', () => {
+        chrome.runtime.sendMessage({ action: 'freezeWindowAllTabs' });
     });
-    operationArea.appendChild(supportButton);
+    operationArea.appendChild(freezeAllButton);
     sidebar.appendChild(operationArea);
 
     // Create 'github' button
@@ -306,11 +310,4 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
             console.error('无法获取窗口ID');
         }
     })
-});
-
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-    if (message === 'reloadContentScript') {
-        // 这里可以执行任何你想要的重新初始化逻辑
-        window.location.reload();
-    }
 });

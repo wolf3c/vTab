@@ -1,3 +1,7 @@
+if (chrome.runtime.getManifest().isReleased) {
+    console.log = function () { };
+}
+
 chrome.runtime.onInstalled.addListener(function (details) {
     console.log("vtab extension installed.");
 
@@ -61,22 +65,40 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'activateTab') {
-        console.log('Received activateTab message for tabId:', request.tabId);
-        chrome.tabs.update(request.tabId, { active: true });
-    } else if (request.action === 'closeTab') {
-        chrome.tabs.remove(request.tabId, () => {
-            console.log('Tab closed:', request.tabId);
-        });
-    } else if (request.action === 'discardTab') {
-        chrome.tabs.discard(request.tabId, () => {
-            console.log('Tab discarded:', request.tabId);
-            updateTabsInStorage();
-        });
-    } else if (request.action === 'GET_WINDOW_ID') {
-        // 获取当前活动的窗口，参考  https://stackoverflow.com/questions/38556602/get-window-id-from-javascript-with-help-of-chrome-extension
-        sendResponse({ windowId: sender.tab.windowId })
-        // 需要返回 true 以表示我们将异步发送响应
-        return true;
+    switch (request.action) {
+        case 'activateTab':
+            console.log('Received activateTab message for tabId:', request.tabId);
+            chrome.tabs.update(request.tabId, { active: true });
+            break;
+        case 'closeTab':
+            chrome.tabs.remove(request.tabId, () => {
+                console.log('Tab closed:', request.tabId);
+            });
+            break;
+        case 'discardTab':
+            chrome.tabs.discard(request.tabId, () => {
+                console.log('Tab discarded:', request.tabId);
+                updateTabsInStorage();
+            });
+            break;
+        case 'GET_WINDOW_ID':
+            // 获取当前活动的窗口，参考  https://stackoverflow.com/questions/38556602/get-window-id-from-javascript-with-help-of-chrome-extension
+            sendResponse({ windowId: sender.tab.windowId })
+            // 需要返回 true 以表示我们将异步发送响应
+            return true;
+            break;
+        case 'freezeWindowAllTabs':
+            chrome.storage.local.get('tabs_' + sender.tab.windowId, (data) => {
+                const tabs = data['tabs_' + sender.tab.windowId] || [];
+                tabs.filter(tab => tab.active != true && tab.status != 'unloaded' && tab.discarded === false).forEach((tab) => {
+                    chrome.tabs.discard(tab.id, () => {
+                        console.log('Tab discarded:', tab.id);
+                    })
+                })
+                updateTabsInStorage();
+            });
+            break;
+        default:
+            break;
     }
 });
