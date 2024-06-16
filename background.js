@@ -47,6 +47,8 @@ function updateTabsInStorage() {
 chrome.tabs.onRemoved.addListener(updateTabsInStorage);
 chrome.tabs.onCreated.addListener(updateTabsInStorage);
 chrome.tabs.onActivated.addListener(updateTabsInStorage);
+chrome.tabs.onDetached.addListener(updateTabsInStorage);
+chrome.tabs.onAttached.addListener(updateTabsInStorage);
 chrome.windows.onFocusChanged.addListener(updateTabsInStorage);
 chrome.windows.onRemoved.addListener(updateTabsInStorage);
 chrome.windows.onCreated.addListener(updateTabsInStorage);
@@ -69,6 +71,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else if (request.action === 'discardTab') {
         chrome.tabs.discard(request.tabId, () => {
             console.log('Tab discarded:', request.tabId);
+            updateTabsInStorage();
         });
     } else if (request.action === 'GET_WINDOW_ID') {
         // 获取当前活动的窗口，参考  https://stackoverflow.com/questions/38556602/get-window-id-from-javascript-with-help-of-chrome-extension
