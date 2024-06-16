@@ -33,6 +33,27 @@ function createSidebar() {
     }
     
     #operation-area {
+        position: sticky;
+        top: 0;
+        z-index: 2147483647;
+        background-color: #f7f7f7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+    #operation-area button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+    
+    #footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 2147483647;
+        background-color: #f7f7f7;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -147,15 +168,6 @@ function createSidebar() {
     operationArea.appendChild(freezeAllButton);
     sidebar.appendChild(operationArea);
 
-    // Create 'github' button
-    const githubButton = document.createElement('button');
-    githubButton.textContent = '🏚️ Github';
-    githubButton.addEventListener('click', () => {
-        window.open('https://github.com/wolf3c/vTab', '_blank');
-    });
-    operationArea.appendChild(githubButton);
-    sidebar.appendChild(operationArea);
-
     // Create the pin button
     const pinButton = document.createElement('button');
     pinButton.id = 'pin-toggle';
@@ -174,6 +186,7 @@ function createSidebar() {
     });
 
     operationArea.appendChild(pinButton);
+
     sidebar.appendChild(operationArea);
 
     // Create search input
@@ -200,6 +213,20 @@ function createSidebar() {
     const tabList = document.createElement('ul');
     tabList.id = 'vtab-list';
     sidebar.appendChild(tabList);
+
+    // Create the footer
+    const footer = document.createElement('div');
+    footer.id = 'footer';
+    
+    // Create 'github' button
+    const githubButton = document.createElement('button');
+    githubButton.textContent = '🏚️ Github';
+    githubButton.addEventListener('click', () => {
+        window.open('https://github.com/wolf3c/vTab', '_blank');
+    });
+    footer.appendChild(githubButton);
+
+    sidebar.appendChild(footer);
 
     // document.body.appendChild(sidebar);
 
