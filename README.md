@@ -13,6 +13,7 @@ It will not have any impact on your current browsing experience.
 - [x] manage tabs(check, switch, close) in sidebar smoothly;
 - [x] pin vtab sidebar;
 - [x] search tabs;
+- [x] freeze tabs & freeze all tabs in the window;
 
 
 # How to install
