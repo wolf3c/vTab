@@ -58,9 +58,9 @@ function createSidebar() {
         justify-content: space-between;
         align-items: center;
         padding: 10px;
-        border-bottom: 1px solid #ccc;
+        border-top: 1px solid #ccc;
     }
-    #operation-area button {
+    #footer button {
         background-color: transparent;
         border: none;
         cursor: pointer;
@@ -168,6 +168,16 @@ function createSidebar() {
     operationArea.appendChild(freezeAllButton);
     sidebar.appendChild(operationArea);
 
+    // Create '+' button to add new tab
+    const addButton = document.createElement('button');
+    addButton.textContent = '+';
+    addButton.style.fontWeight='bolder';
+    addButton.style.border='solid';
+    addButton.addEventListener('click', () => {
+        chrome.runtime.sendMessage({ action: 'addNewTab', url: '' });
+    });
+    operationArea.appendChild(addButton);
+
     // Create the pin button
     const pinButton = document.createElement('button');
     pinButton.id = 'pin-toggle';
@@ -225,6 +235,14 @@ function createSidebar() {
         window.open('https://github.com/wolf3c/vTab', '_blank');
     });
     footer.appendChild(githubButton);
+
+    // Create '❤️ Support Me' button
+    const supportButton = document.createElement('button');
+    supportButton.textContent = '❤️ Support Me';
+    supportButton.addEventListener('click', () => {
+        window.open('https://www.buymeacoffee.com/wolf3cg', '_blank');
+    });
+    footer.appendChild(supportButton);
 
     sidebar.appendChild(footer);
 

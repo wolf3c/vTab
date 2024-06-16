@@ -98,6 +98,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 updateTabsInStorage();
             });
             break;
+        case 'addNewTab':
+            chrome.tabs.create({}, () => {
+                console.log('New tab created');
+            });
+            break;
         default:
             break;
     }
