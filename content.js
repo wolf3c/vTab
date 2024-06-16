@@ -171,8 +171,8 @@ function createSidebar() {
     // Create '+' button to add new tab
     const addButton = document.createElement('button');
     addButton.textContent = '+';
-    addButton.style.fontWeight='bolder';
-    addButton.style.border='solid';
+    addButton.style.fontWeight = 'bolder';
+    addButton.style.border = 'solid';
     addButton.addEventListener('click', () => {
         chrome.runtime.sendMessage({ action: 'addNewTab', url: '' });
     });
@@ -183,16 +183,7 @@ function createSidebar() {
     pinButton.id = 'pin-toggle';
     pinButton.textContent = '📌 Pin';
     pinButton.addEventListener('click', () => {
-        const isPinned = sidebar.getAttribute('data-pinned') === 'true';
-        pinButton.textContent = isPinned ? '📌 Pin' : '📌 Unpin';
-
-        if (isPinned) {
-            sidebar.setAttribute('data-pinned', 'false');
-            document.body.style.marginLeft = '0'; // Reset body margin
-        } else {
-            sidebar.setAttribute('data-pinned', 'true');
-            document.body.style.marginLeft = '250px'; // Adjust body margin to make room for sidebar
-        }
+        chrome.runtime.sendMessage({ action: 'toggleSidebarPin' });
     });
 
     operationArea.appendChild(pinButton);
@@ -227,7 +218,7 @@ function createSidebar() {
     // Create the footer
     const footer = document.createElement('div');
     footer.id = 'footer';
-    
+
     // Create 'github' button
     const githubButton = document.createElement('button');
     githubButton.textContent = '🏚️ Github';
@@ -295,7 +286,7 @@ function updateTabList() {
                     });
 
                     addCloseButton(listItem); // Add close button to each tab item
-                    if (!tab.discarded) addDiscardButton(listItem); 
+                    if (!tab.discarded) addDiscardButton(listItem);
                     console.log(listItem)
 
                     tabList.appendChild(listItem);
@@ -320,7 +311,7 @@ function updateTabList() {
 
         listItem.appendChild(closeButton);
     }
-    
+
     function addDiscardButton(listItem) {
         const discardButton = document.createElement('button');
         discardButton.className = 'discard-button';
@@ -340,6 +331,7 @@ function updateTabList() {
 // Initialize sidebar on page load
 createSidebar();
 updateTabList();
+togglePin();
 
 // Update tab list when tabs change
 chrome.storage.onChanged.addListener((changes, namespace) => {
@@ -351,8 +343,57 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
             if (changes['tabs_' + response.windowId]) {
                 updateTabList();
             }
+            if (changes['isSidebarPinned']) {
+                console.log('isSidebarPinned changed');
+                // chrome.storage.local.get('isSidebarPinned', (data) => {
+                //     const isPinned = data.isSidebarPinned['window_' + response.windowId];
+
+                //     const pinButton = host.shadowRoot.getElementById('pin-toggle');
+                //     pinButton.textContent = isPinned ? '📌 Unpin' : '📌 Pin';
+
+                //     const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
+
+                //     if (isPinned) {
+                //         sidebar.setAttribute('data-pinned', 'true');
+                //         sidebar.style.left = '0';
+                //         document.body.style.marginLeft = '250px'; // Adjust body margin to make room for sidebar
+                //     } else {
+                //         sidebar.setAttribute('data-pinned', 'false');
+                //         sidebar.style.left = '-240px';
+                //         document.body.style.marginLeft = '0'; // Reset body margin
+                //     }
+                // })
+                togglePin();
+            }
         } else {
             console.error('无法获取窗口ID');
         }
     })
 });
+
+function togglePin() {
+    console.log('togglePin')
+    // check if the sidebar is pinned
+    chrome.runtime.sendMessage({ action: 'checkSidebarPin' }, (response) => {
+        if (response && response.isSidebarPinned !== undefined) {
+            console.log('isSidebarPinned response', response)
+            const isPinned = response.isSidebarPinned;
+            console.log('isPinned: ', isPinned)
+
+            const pinButton = host.shadowRoot.getElementById('pin-toggle');
+            pinButton.textContent = isPinned ? '📌 Unpin' : '📌 Pin';
+
+            const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
+
+            if (isPinned) {
+                sidebar.setAttribute('data-pinned', 'true');
+                sidebar.style.left = '0';
+                document.body.style.marginLeft = '250px'; // Adjust body margin to make room for sidebar
+            } else {
+                sidebar.setAttribute('data-pinned', 'false');
+                sidebar.style.left = '-240px';
+                document.body.style.marginLeft = '0'; // Reset body margin
+            }
+        }
+    });
+}

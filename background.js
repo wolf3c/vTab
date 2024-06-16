@@ -86,7 +86,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ windowId: sender.tab.windowId })
             // 需要返回 true 以表示我们将异步发送响应
             return true;
-            break;
         case 'freezeWindowAllTabs':
             chrome.storage.local.get('tabs_' + sender.tab.windowId, (data) => {
                 const tabs = data['tabs_' + sender.tab.windowId] || [];
@@ -103,6 +102,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 console.log('New tab created');
             });
             break;
+        case 'toggleSidebarPin':
+            chrome.storage.local.get('isSidebarPinned', (data) => {
+                const isPinned = !data?.isSidebarPinned?.['window_'+sender.tab.windowId];
+                chrome.storage.local.set({isSidebarPinned: {['window_'+sender.tab.windowId]: isPinned}}, () => {
+                    console.log('Pin state set to', isPinned);
+                });
+            });
+            break;
+        case 'checkSidebarPin':
+            console.log('checkSidebarPin')
+            chrome.storage.local.get('isSidebarPinned', (data) => {
+                sendResponse({isSidebarPinned: data?.isSidebarPinned?.['window_'+sender.tab.windowId]});
+            });
+            return true;
         default:
             break;
     }
