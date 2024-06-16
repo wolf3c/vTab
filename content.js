@@ -23,7 +23,7 @@ function createSidebar() {
         height: 100%;
         background-color: #f7f7f7; /* Set light gray background */
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Add shadow effect */
-        transition: width 0.3s, box-shadow 0.3s;
+        transition: left 0.1s linear;
         z-index: 2147483647;
         overflow-y: auto; /* Ensure vertical scrolling if content overflows */
     }
@@ -155,7 +155,7 @@ function createSidebar() {
     // Create the pin button
     const pinButton = document.createElement('button');
     pinButton.id = 'pin-toggle';
-    pinButton.textContent = '📌Pin';
+    pinButton.textContent = '📌 Pin';
     pinButton.addEventListener('click', () => {
         const isPinned = sidebar.getAttribute('data-pinned') === 'true';
         pinButton.textContent = isPinned ? '📌 Pin' : '📌 Unpin';
@@ -269,16 +269,7 @@ function updateTabList() {
             chrome.runtime.sendMessage({ action: 'closeTab', tabId: tabId });
         });
 
-        // listItem.style.position = 'relative'; // 设置父级列表项的位置为相对定位
         listItem.appendChild(closeButton);
-
-        // listItem.addEventListener('mouseenter', () => {
-        //     closeButton.style.display = 'block';
-        // });
-
-        // listItem.addEventListener('mouseleave', () => {
-        //     closeButton.style.display = 'none';
-        // });
     }
     
     function addDiscardButton(listItem) {
@@ -292,16 +283,7 @@ function updateTabList() {
             chrome.runtime.sendMessage({ action: 'discardTab', tabId: tabId });
         });
 
-        // listItem.style.position = 'relative'; // 设置父级列表项的位置为相对定位
         listItem.appendChild(discardButton);
-
-        // listItem.addEventListener('mouseenter', () => {
-        //     discardButton.style.display = 'block';
-        // });
-
-        // listItem.addEventListener('mouseleave', () => {
-        //     discardButton.style.display = 'none';
-        // });
     }
 }
 
