@@ -131,10 +131,10 @@ function createSidebar() {
     }
 
     .close-button {
-        right: 6px;
+        right: 8px;
     }
     .discard-button {
-        left: 6px;
+        left: 8px;
     }
 </style>
 `;
