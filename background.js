@@ -89,7 +89,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case 'freezeWindowAllTabs':
             chrome.storage.local.get('tabs_' + sender.tab.windowId, (data) => {
                 const tabs = data['tabs_' + sender.tab.windowId] || [];
-                tabs.filter(tab => tab.active != true && tab.pinned != true && tab.audible != true && tab.status != 'unloaded' && tab.discarded === false).forEach((tab) => {
+                tabs.filter(tab => tab.active != true && tab.pinned === false && tab.audible === false && tab.status != 'unloaded' && tab.discarded === false).forEach((tab) => {
                     chrome.tabs.discard(tab.id, () => {
                         console.log('Tab discarded:', tab.id);
                     })
