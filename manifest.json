@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "vtab",
+    "name": "vTab",
     "description": "Vertical tab manager for your browser",
     "version": "2.5",
     "permissions": [
