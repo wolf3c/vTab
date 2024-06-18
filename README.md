@@ -13,6 +13,8 @@ It will not have any impact on your current browsing experience.
 - freeze tabs & freeze all tabs in the window (free RAM of you PC);
 - create new tab;
 
+**Telegram Group**: [vtab users](https://t.me/+QQLV4RqH4940NjNl)
+
 vTab 给你的浏览器提供一个快如闪电的**侧边栏标签页管理器**。
 
 并且，它不会影响你现在的浏览器使用体验。
@@ -26,8 +28,7 @@ vTab 给你的浏览器提供一个快如闪电的**侧边栏标签页管理器*
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OWsM3PU7UKA/0.jpg)](https://www.youtube.com/watch?v=OWsM3PU7UKA)
 
-**TODO**:
-- [ ] display pined tabs horizontal;
+**TODO List**:
 - [ ] auto archive the tabs not opened long time;
 
 
