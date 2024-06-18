@@ -9,6 +9,10 @@ host.id = 'vtab-host';
 host.className = 'vtab-host';
 document.body.appendChild(host);
 
+let settings = {
+    tabsListSortUnfreezed: false
+}
+
 function createSidebar() {
     const shadow = host.attachShadow({ mode: 'open' });
 
@@ -140,6 +144,41 @@ function createSidebar() {
     .discard-button {
         left: 8px;
     }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    .modal .close-button {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .modal .close-button:hover,
+    .modal .close-button:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
 </style>
 `;
 
@@ -266,39 +305,40 @@ function updateTabList() {
                 const tabs = data['tabs_' + response.windowId] || [];
                 const tabList = host.shadowRoot.getElementById('vtab-list');
                 tabList.innerHTML = '';
+                tabs
+                    .sort((a, b) => settings.tabsListSortUnfreezed ? a.discarded - b.discarded : 0)
+                    .forEach(tab => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'vtab-list-item';
+                        listItem.className += tab.discarded ? ' discarded' : '';
 
-                tabs.forEach(tab => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'vtab-list-item';
-                    listItem.className += tab.discarded ? ' discarded' : '';
+                        const favicon = tab.favIconUrl; // Get favicon URL from tab data
+                        if (favicon) {
+                            const faviconImg = document.createElement('img');
+                            faviconImg.src = favicon;
+                            listItem.appendChild(faviconImg); // Add favicon image to list item
+                        }
 
-                    const favicon = tab.favIconUrl; // Get favicon URL from tab data
-                    if (favicon) {
-                        const faviconImg = document.createElement('img');
-                        faviconImg.src = favicon;
-                        listItem.appendChild(faviconImg); // Add favicon image to list item
-                    }
+                        const titleSpan = document.createElement('span');
+                        titleSpan.textContent = tab.title;
+                        listItem.appendChild(titleSpan);
 
-                    const titleSpan = document.createElement('span');
-                    titleSpan.textContent = tab.title;
-                    listItem.appendChild(titleSpan);
+                        listItem.dataset.tabId = tab.id;
 
-                    listItem.dataset.tabId = tab.id;
+                        if (tab.active) {
+                            listItem.style.backgroundColor = '#ddd';
+                        }
 
-                    if (tab.active) {
-                        listItem.style.backgroundColor = '#ddd';
-                    }
+                        listItem.addEventListener('click', () => {
+                            console.log('Tab item clicked', listItem.dataset.tabId);
+                            chrome.runtime.sendMessage({ action: 'activateTab', tabId: parseInt(listItem.dataset.tabId) });
+                        });
 
-                    listItem.addEventListener('click', () => {
-                        console.log('Tab item clicked', listItem.dataset.tabId);
-                        chrome.runtime.sendMessage({ action: 'activateTab', tabId: parseInt(listItem.dataset.tabId) });
+                        addCloseButton(listItem); // Add close button to each tab item
+                        if (!tab.discarded) addDiscardButton(listItem);
+
+                        tabList.appendChild(listItem);
                     });
-
-                    addCloseButton(listItem); // Add close button to each tab item
-                    if (!tab.discarded) addDiscardButton(listItem);
-
-                    tabList.appendChild(listItem);
-                });
             });
         } else {
             console.error('无法获取窗口ID');
@@ -376,9 +416,20 @@ function scrollSidebar() {
     })
 }
 
+function sortUnfreezed() {
+    chrome.storage.local.get('vtab_settings', (data) => {
+        console.log('vtab_settings', data)
+        if (data && data?.vtab_settings?.sortUnfreezed !== undefined) {
+            settings.tabsListSortUnfreezed = data?.vtab_settings?.sortUnfreezed;
+            updateTabList();
+        }
+    })
+}
+
 // Initialize sidebar on page load
 createSidebar();
-updateTabList();
+sortUnfreezed();
+// updateTabList();
 togglePin();
 // 暂停100ms后再执行
 setTimeout(() => {
@@ -388,6 +439,10 @@ setTimeout(() => {
 // Update tab list when tabs change
 chrome.storage.onChanged.addListener((changes, namespace) => {
     // 向后台脚本发送消息以获取当前窗口 ID
+    if (changes.vtab_settings) {
+        console.log('vtab_settings changed');
+        sortUnfreezed()
+    }
     chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
         if (response && response.windowId !== undefined) {
             console.log('当前窗口的ID是：', response.windowId);
