@@ -50,7 +50,7 @@ function createSidebar() {
     }
     
     #footer {
-        position: sticky;
+        position: fixed;
         bottom: 0;
         z-index: 2147483647;
         background-color: #f7f7f7;
@@ -59,6 +59,7 @@ function createSidebar() {
         align-items: center;
         padding: 10px;
         border-top: 1px solid #ccc;
+        width: 230px;
     }
     #footer button {
         background-color: transparent;
@@ -75,6 +76,7 @@ function createSidebar() {
         list-style: none;
         padding: 0;
         margin: 0;
+        margin-bottom: 50px;
         textAlign: left;
     }
     
