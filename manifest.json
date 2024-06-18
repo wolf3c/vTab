@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "vTab",
     "description": "Vertical tab manager for your browser",
-    "version": "2.5",
+    "version": "2.6",
     "permissions": [
         "tabs",
         "storage",
