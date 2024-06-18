@@ -369,6 +369,7 @@ function scrollSidebar() {
             console.log('isScrollSidebar response', response)
             const scrollTop = response.scrollTop;
             const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
+            console.log('sidebar', sidebar, scrollTop)
             sidebar.scrollTo(0, scrollTop);
             console.log('scrollSidebar changed');
         }
@@ -379,7 +380,10 @@ function scrollSidebar() {
 createSidebar();
 updateTabList();
 togglePin();
-scrollSidebar();
+// 暂停100ms后再执行
+setTimeout(() => {
+    scrollSidebar();
+}, 10)
 
 // Update tab list when tabs change
 chrome.storage.onChanged.addListener((changes, namespace) => {

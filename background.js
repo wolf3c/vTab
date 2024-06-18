@@ -123,12 +123,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case 'checkScrollSidebar':
             chrome.storage.local.get('scrollSidebar', (data) => {
                 const scrollTop = data?.scrollSidebar?.['window_' + sender.tab.windowId];
-                console.log('checkScrollSidebar scrollTop', scrollTop, sender)
-                if (sender.tab.active !== true) {
+                console.log('checkScrollSidebar scrollTop', scrollTop, sender.tab.windowId, sender)
                     sendResponse({ scrollTop: scrollTop });
-                } else {
-                    sendResponse({ scrollTop: false });
-                }
                 });
             return true;
         default:
