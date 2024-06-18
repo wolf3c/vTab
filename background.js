@@ -104,8 +104,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             break;
         case 'toggleSidebarPin':
             chrome.storage.local.get('isSidebarPinned', (data) => {
-                const isPinned = !data?.isSidebarPinned?.['window_'+sender.tab.windowId];
-                chrome.storage.local.set({isSidebarPinned: {['window_'+sender.tab.windowId]: isPinned}}, () => {
+                const isPinned = !data?.isSidebarPinned?.['window_' + sender.tab.windowId];
+                chrome.storage.local.set({ isSidebarPinned: { ['window_' + sender.tab.windowId]: isPinned } }, () => {
                     console.log('Pin state set to', isPinned);
                 });
             });
@@ -113,8 +113,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case 'checkSidebarPin':
             console.log('checkSidebarPin')
             chrome.storage.local.get('isSidebarPinned', (data) => {
-                sendResponse({isSidebarPinned: data?.isSidebarPinned?.['window_'+sender.tab.windowId]});
+                sendResponse({ isSidebarPinned: data?.isSidebarPinned?.['window_' + sender.tab.windowId] });
             });
+            return true;
+        case 'scrollSidebar':
+            chrome.storage.local.set({ scrollSidebar: { ['window_' + sender.tab.windowId]: request.scrollTop } }, () => {
+                console.log('scrollSidebar set to', request.scrollTop);
+            });
+        case 'checkScrollSidebar':
+            chrome.storage.local.get('scrollSidebar', (data) => {
+                const scrollTop = data?.scrollSidebar?.['window_' + sender.tab.windowId];
+                console.log('checkScrollSidebar scrollTop', scrollTop, sender)
+                if (sender.tab.active !== true) {
+                    sendResponse({ scrollTop: scrollTop });
+                } else {
+                    sendResponse({ scrollTop: false });
+                }
+                });
             return true;
         default:
             break;

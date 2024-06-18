@@ -146,18 +146,27 @@ function createSidebar() {
     const sidebar = document.createElement('div');
     sidebar.id = 'vtab-sidebar';
 
+    let isMouseOver = false
     sidebar.addEventListener('mouseenter', () => {
+        isMouseOver = true;
         const isPinned = sidebar.getAttribute('data-pinned') === 'true';
         if (!isPinned) {
             sidebar.style.left = '0';
         }
     });
     sidebar.addEventListener('mouseleave', () => {
+        isMouseOver = false;
         const isPinned = sidebar.getAttribute('data-pinned') === 'true';
         if (!isPinned) {
             sidebar.style.left = '-240px';
         }
     });
+    sidebar.addEventListener('scrollend', () => {
+        if (isMouseOver) {
+            console.log('sidebar scroll: ', sidebar.scrollTop);
+            chrome.runtime.sendMessage({ action: 'scrollSidebar', scrollTop: sidebar.scrollTop });
+        }
+    })
 
     // Create the operation area at the top
     const operationArea = document.createElement('div');
@@ -252,22 +261,18 @@ function updateTabList() {
     // 向后台脚本发送消息以获取当前窗口 ID
     chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
         if (response && response.windowId !== undefined) {
-            console.log('当前窗口的ID是：', response.windowId);
             // 你可以在这里执行其他操作
             chrome.storage.local.get('tabs_' + response.windowId, (data) => {
-                console.log(data)
                 const tabs = data['tabs_' + response.windowId] || [];
                 const tabList = host.shadowRoot.getElementById('vtab-list');
                 tabList.innerHTML = '';
 
                 tabs.forEach(tab => {
-                    console.log('Tab:', tab);
                     const listItem = document.createElement('li');
                     listItem.className = 'vtab-list-item';
                     listItem.className += tab.discarded ? ' discarded' : '';
 
                     const favicon = tab.favIconUrl; // Get favicon URL from tab data
-                    console.log('favicon: ', favicon)
                     if (favicon) {
                         const faviconImg = document.createElement('img');
                         faviconImg.src = favicon;
@@ -291,7 +296,6 @@ function updateTabList() {
 
                     addCloseButton(listItem); // Add close button to each tab item
                     if (!tab.discarded) addDiscardButton(listItem);
-                    console.log(listItem)
 
                     tabList.appendChild(listItem);
                 });
@@ -331,50 +335,6 @@ function updateTabList() {
     }
 }
 
-
-// Initialize sidebar on page load
-createSidebar();
-updateTabList();
-togglePin();
-
-// Update tab list when tabs change
-chrome.storage.onChanged.addListener((changes, namespace) => {
-    // 向后台脚本发送消息以获取当前窗口 ID
-    chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
-        if (response && response.windowId !== undefined) {
-            console.log('当前窗口的ID是：', response.windowId);
-            // 你可以在这里执行其他操作
-            if (changes['tabs_' + response.windowId]) {
-                updateTabList();
-            }
-            if (changes['isSidebarPinned']) {
-                console.log('isSidebarPinned changed');
-                // chrome.storage.local.get('isSidebarPinned', (data) => {
-                //     const isPinned = data.isSidebarPinned['window_' + response.windowId];
-
-                //     const pinButton = host.shadowRoot.getElementById('pin-toggle');
-                //     pinButton.textContent = isPinned ? '📌 Unpin' : '📌 Pin';
-
-                //     const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
-
-                //     if (isPinned) {
-                //         sidebar.setAttribute('data-pinned', 'true');
-                //         sidebar.style.left = '0';
-                //         document.body.style.marginLeft = '250px'; // Adjust body margin to make room for sidebar
-                //     } else {
-                //         sidebar.setAttribute('data-pinned', 'false');
-                //         sidebar.style.left = '-240px';
-                //         document.body.style.marginLeft = '0'; // Reset body margin
-                //     }
-                // })
-                togglePin();
-            }
-        } else {
-            console.error('无法获取窗口ID');
-        }
-    })
-});
-
 function togglePin() {
     console.log('togglePin')
     // check if the sidebar is pinned
@@ -401,3 +361,66 @@ function togglePin() {
         }
     });
 }
+
+function scrollSidebar() {
+    chrome.runtime.sendMessage({ action: 'checkScrollSidebar' }, (response) => {
+        console.log('checkScrollSidebar response', response)
+        if (response && response.scrollTop !== undefined && response.scrollTop !== false) {
+            console.log('isScrollSidebar response', response)
+            const scrollTop = response.scrollTop;
+            const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
+            sidebar.scrollTo(0, scrollTop);
+            console.log('scrollSidebar changed');
+        }
+    })
+}
+
+// Initialize sidebar on page load
+createSidebar();
+updateTabList();
+togglePin();
+scrollSidebar();
+
+// Update tab list when tabs change
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    // 向后台脚本发送消息以获取当前窗口 ID
+    chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
+        if (response && response.windowId !== undefined) {
+            console.log('当前窗口的ID是：', response.windowId);
+            // 你可以在这里执行其他操作
+            if (changes['tabs_' + response.windowId]) {
+                updateTabList();
+            }
+            if (changes['isSidebarPinned']) {
+                console.log('isSidebarPinned changed');
+                togglePin();
+            }
+            if (changes['scrollSidebar']) {
+                console.log('scrollSidebar changed');
+                scrollSidebar();
+            }
+        } else {
+            console.error('无法获取窗口ID');
+        }
+    })
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log('Received message:', request);
+    if (request.action === 'scrollSidebar') {
+        console.log('Received scrollSidebar message:', request);
+        chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
+            console.log('Received GET_WINDOW_ID response:', response);
+            if (response && response.windowId !== undefined) {
+                if (sender.tab.windowId === response.windowId) {
+                    const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
+                    if (sidebar) {
+                        sidebar.scrollTo(0, request.scrollTop);
+                    } else {
+                        console.error('Sidebar not found');
+                    }
+                }
+            }
+        })
+    }
+})
