@@ -98,8 +98,10 @@ function createSidebar() {
     }
 
     .vtab-list-item.discarded {
-        filter: grayscale(100%);
-        opacity: 0.3;
+        img, span {
+            filter: grayscale(100%);
+            opacity: 0.3;
+        }
     }
 
     .vtab-list-item img {
