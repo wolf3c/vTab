@@ -8,7 +8,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
     updateTabsInStorage();
 
     // register content script when extension is updated
-    if (details.reason === 'update') {
+    if (details.reason === 'update' || details.reason === 'install') {
         chrome.windows.getAll({ populate: true }, (windows) => {
             windows.filter(window => window.type === 'normal').forEach((window) => {
                 console.log('window: ', window)
