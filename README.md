@@ -24,7 +24,7 @@ vTab 给你的浏览器提供一个快如闪电的**侧边栏标签页管理器*
 - 冻结单个标签页和冻结窗口中的所有标签页（可释放内存）；
 - 创建新标签页；
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Mc_RFd1lTcI/0.jpg)](https://www.youtube.com/watch?v=Mc_RFd1lTcI)
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OWsM3PU7UKA/0.jpg)](https://www.youtube.com/watch?v=OWsM3PU7UKA)
 
 **TODO**:
 - [ ] display pined tabs horizontal;
@@ -33,7 +33,7 @@ vTab 给你的浏览器提供一个快如闪电的**侧边栏标签页管理器*
 
 # How to install
 
-[Chrome web store](https://chromewebstore.google.com/detail/vtab/fkmcgnjikengcgbeadhmdeneagpdgaea){:target="_blank"} 
+[Chrome web store](https://chromewebstore.google.com/detail/vtab/fkmcgnjikengcgbeadhmdeneagpdgaea) 
 
 # Why develop this new vertical tab manager?
 
