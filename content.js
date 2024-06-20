@@ -246,11 +246,19 @@ function createSidebar() {
 
     // Create '❤️ Support Me' button
     const supportButton = document.createElement('button');
-    supportButton.textContent = '❤️ Support Me';
+    supportButton.textContent = '❤️ Support';
     supportButton.addEventListener('click', () => {
         window.open('https://www.buymeacoffee.com/wolf3cg', '_blank');
     });
     footer.appendChild(supportButton);
+
+    // Create 'settings' button
+    const settingsButton = document.createElement('button');
+    settingsButton.textContent = '⚙️ Settings';
+    settingsButton.addEventListener('click', () => {
+        chrome.runtime.sendMessage({ action: 'openOptionsPage' });
+    });
+    footer.appendChild(settingsButton);
 
     sidebar.appendChild(footer);
 
