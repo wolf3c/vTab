@@ -21,6 +21,24 @@
             padding: 10px;
             font-size: large;
         }
+
+        .footer-btn {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-top: 1px solid #ccc;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -28,6 +46,9 @@
     <h1>vTab Extension</h1>
     <div class="settings">
         <label><input type="checkbox" name="sort-unfreezed" id="sort-unfreezed"> sort unfreezed tabs together</label><br>
+    </div>
+    <div class="footer-btn">
+        <button class="btn" id="ok-button">Okay</button>
     </div>
     <script src="options.js"></script>
 </body>

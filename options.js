@@ -16,4 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         });
     }
+
+    const okButton = document.getElementById('ok-button');
+    if (okButton) {
+        okButton.addEventListener('click', () => {
+            window.close();
+        });
+    }
 });
