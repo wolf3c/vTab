@@ -2,7 +2,7 @@ if (chrome.runtime.getManifest().isReleased) {
     console.log = function () { };
 }
 
-console.log('content.js loaded');
+// console.log('content.js loaded');
 
 const host = document.createElement('div');
 host.id = 'vtab-host';
@@ -167,7 +167,7 @@ function createSidebar() {
     });
     sidebar.addEventListener('scrollend', () => {
         if (isMouseOver) {
-            console.log('sidebar scroll: ', sidebar.scrollTop);
+            // console.log('sidebar scroll: ', sidebar.scrollTop);
             chrome.runtime.sendMessage({ action: 'scrollSidebar', scrollTop: sidebar.scrollTop });
         }
     })
@@ -265,7 +265,7 @@ function createSidebar() {
     // document.body.appendChild(sidebar);
 
     shadow.appendChild(sidebar);
-    console.log('Sidebar created');
+    // console.log('Sidebar created');
 }
 
 
@@ -293,7 +293,7 @@ function updateTabList() {
                         }
 
                         const titleSpan = document.createElement('span');
-                        titleSpan.textContent = tab.title;
+                        titleSpan.textContent = tab.title.length === 0 ? tab.pendingUrl : tab.title;
                         listItem.appendChild(titleSpan);
 
                         listItem.dataset.tabId = tab.id;
@@ -303,7 +303,7 @@ function updateTabList() {
                         }
 
                         listItem.addEventListener('click', () => {
-                            console.log('Tab item clicked', listItem.dataset.tabId);
+                            // console.log('Tab item clicked', listItem.dataset.tabId);
                             chrome.runtime.sendMessage({ action: 'activateTab', tabId: parseInt(listItem.dataset.tabId) });
                         });
 
@@ -349,13 +349,13 @@ function updateTabList() {
 }
 
 function togglePin() {
-    console.log('togglePin')
+    // console.log('togglePin')
     // check if the sidebar is pinned
     chrome.runtime.sendMessage({ action: 'checkSidebarPin' }, (response) => {
         if (response && response.isSidebarPinned !== undefined) {
-            console.log('isSidebarPinned response', response)
+            // console.log('isSidebarPinned response', response)
             const isPinned = response.isSidebarPinned;
-            console.log('isPinned: ', isPinned)
+            // console.log('isPinned: ', isPinned)
 
             const pinButton = host.shadowRoot.getElementById('pin-toggle');
             pinButton.textContent = isPinned ? '📌 Unpin' : '📌 Pin';
@@ -375,23 +375,25 @@ function togglePin() {
     });
 }
 
-function scrollSidebar() {
-    chrome.runtime.sendMessage({ action: 'checkScrollSidebar' }, (response) => {
-        console.log('checkScrollSidebar response', response)
-        if (response && response.scrollTop !== undefined && response.scrollTop !== false) {
-            console.log('isScrollSidebar response', response)
-            const scrollTop = response.scrollTop;
-            const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
-            console.log('sidebar', sidebar, scrollTop)
-            sidebar.scrollTo(0, scrollTop);
-            console.log('scrollSidebar changed');
-        }
-    })
+function scrollSidebar(scrollTop=null) {
+    if (!scrollTop) {
+        chrome.storage.local.get('scrollSidebar', (data) => {
+            chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
+                scrollTop = data?.scrollSidebar?.['window_' + response.windowId]?.scrollTop || 0;
+                // console.log(scrollTop)
+                if (data?.scrollSidebar?.['window_' + response.windowId]?.tabId !== response.tabId) {
+                    scrollSidebar(scrollTop)
+                }
+            })
+        })
+    }
+    const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
+    sidebar.scrollTo(0, scrollTop);
 }
 
 function sortUnfreezed() {
     chrome.storage.local.get('vtab_settings', (data) => {
-        console.log('vtab_settings', data)
+        // console.log('vtab_settings', data)
         if (data && data?.vtab_settings?.sortUnfreezed !== undefined) {
             settings.tabsListSortUnfreezed = data?.vtab_settings?.sortUnfreezed;
             updateTabList();
@@ -412,8 +414,9 @@ setTimeout(() => {
 // Update tab list when tabs change
 chrome.storage.onChanged.addListener((changes, namespace) => {
     // 向后台脚本发送消息以获取当前窗口 ID
+    // console.log(changes)
     if (changes.vtab_settings) {
-        console.log('vtab_settings changed');
+        // console.log('vtab_settings changed');
         sortUnfreezed()
     }
     chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
@@ -423,13 +426,15 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
             if (changes['tabs_' + response.windowId]) {
                 updateTabList();
             }
-            if (changes['isSidebarPinned']) {
-                console.log('isSidebarPinned changed');
+            if (changes.isSidebarPinned) {
+                // console.log('isSidebarPinned changed');
                 togglePin();
             }
-            if (changes['scrollSidebar']) {
-                console.log('scrollSidebar changed');
-                scrollSidebar();
+            if (changes.scrollSidebar) {
+                if (changes.scrollSidebar.newValue?.['window_' + response.windowId] && changes.scrollSidebar.newValue['window_' + response.windowId].tabid !== response.tabId) {
+                    // console.log('scrollSidebar changed');
+                    scrollSidebar(changes.scrollSidebar.newValue['window_' + response.windowId].scrollTop);
+                }
             }
         } else {
             console.error('无法获取窗口ID');
@@ -438,18 +443,16 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log('Received message:', request);
+    // console.log('Received message:', request);
     if (request.action === 'scrollSidebar') {
-        console.log('Received scrollSidebar message:', request);
+        // console.log('Received scrollSidebar message:', request);
         chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
-            console.log('Received GET_WINDOW_ID response:', response);
+            // console.log('Received GET_WINDOW_ID response:', response);
             if (response && response.windowId !== undefined) {
                 if (sender.tab.windowId === response.windowId) {
                     const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
                     if (sidebar) {
                         sidebar.scrollTo(0, request.scrollTop);
-                    } else {
-                        console.error('Sidebar not found');
                     }
                 }
             }
