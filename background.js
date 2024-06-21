@@ -124,9 +124,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             chrome.storage.local.get('scrollSidebar', (data) => {
                 const scrollTop = data?.scrollSidebar?.['window_' + sender.tab.windowId];
                 console.log('checkScrollSidebar scrollTop', scrollTop, sender.tab.windowId, sender)
-                    sendResponse({ scrollTop: scrollTop });
-                });
+                sendResponse({ scrollTop: scrollTop });
+            });
             return true;
+        case 'openOptionsPage':
+            chrome.runtime.openOptionsPage();
+            break;
         default:
             break;
     }

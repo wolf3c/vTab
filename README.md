@@ -11,7 +11,7 @@ It will not have any impact on your current browsing experience.
 - pin the vTab sidebar;
 - search tabs;
 - freeze tabs & freeze all tabs in the window (free RAM of you PC);
-- sort by freezed status(show unfreezed tabs together at top for easily access)
+- sort by freezed status(show unfreezed tabs together at top for easily access);
 - create new tab;
 
 **Telegram Group**: [vtab users](https://t.me/+QQLV4RqH4940NjNl)
@@ -25,7 +25,7 @@ vTab 给你的浏览器提供一个快如闪电的**侧边栏标签页管理器*
 - 固定vTab侧边栏；
 - 搜索标签页；
 - 冻结单个标签页和冻结窗口中的所有标签页（可释放内存）；
-- 按冻结状态排序（将未冻结的标签页排在顶部，以便轻松访问）
+- 按冻结状态排序（将未冻结的标签页排在顶部，以便轻松访问）;
 - 创建新标签页；
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OWsM3PU7UKA/0.jpg)](https://www.youtube.com/watch?v=OWsM3PU7UKA)
