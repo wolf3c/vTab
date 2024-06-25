@@ -315,7 +315,7 @@ function updateTabList() {
                         });
 
                         addCloseButton(listItem); // Add close button to each tab item
-                        if (!tab.discarded) addDiscardButton(listItem);
+                        if (!tab.discarded && tab.active === false && tab.status !== 'unloaded') addDiscardButton(listItem);
 
                         tabList.appendChild(listItem);
                     });
