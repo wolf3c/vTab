@@ -7,6 +7,13 @@ if (chrome.runtime.getManifest().isReleased) {
 const host = document.createElement('div');
 host.id = 'vtab-host';
 host.className = 'vtab-host';
+host.innerHTML = `
+<style>
+    .vtab-host {
+        all: initial;
+    }
+</style>
+`;
 document.body.appendChild(host);
 
 let settings = {
@@ -279,11 +286,11 @@ function updateTabList() {
                 const tabList = host.shadowRoot.getElementById('vtab-list');
                 tabList.innerHTML = '';
                 tabs
-                    .sort((a, b) => settings.tabsListSortUnfreezed ? a.discarded - b.discarded : 0)
+                    .sort((a, b) => settings.tabsListSortUnfreezed ? a.discarded - b.discarded + (a.status === 'unloaded' ? 1 : 0) - (b.status === 'unloaded' ? 1 : 0) : 0)
                     .forEach(tab => {
                         const listItem = document.createElement('li');
                         listItem.className = 'vtab-list-item';
-                        listItem.className += tab.discarded ? ' discarded' : '';
+                        listItem.className += tab.discarded || tab.status === 'unloaded' ? ' discarded' : '';
 
                         const favicon = tab.favIconUrl; // Get favicon URL from tab data
                         if (favicon) {
