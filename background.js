@@ -1,16 +1,17 @@
 if (chrome.runtime.getManifest().isReleased) {
-    // console.log = function () { };
+    console.log = function () { };
 }
 
 chrome.runtime.onInstalled.addListener(function (details) {
-    // console.log("vtab extension installed.");
+    console.log("vtab extension installed.");
 
-    updateTabsInStorage();
+    // updateTabsInStorage();
 
     // register content script when extension is updated
     if (details.reason === 'update' || details.reason === 'install') {
-        chrome.windows.getAll({ populate: true }, (windows) => {
-            windows.filter(window => window.type === 'normal').forEach((window) => {
+        chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }, (windows) => {
+            console.log('windows: ', windows)
+            windows.forEach((window) => {
                 // console.log('window: ', window)
                 window.tabs.filter(tab => tab.status != 'unloaded' && tab.discarded === false).forEach((tab) => {
                     // console.log('chrome.scripting.executeScript - tab: ', tab)
@@ -24,7 +25,13 @@ chrome.runtime.onInstalled.addListener(function (details) {
                                 vtabHosts[0].parentNode.removeChild(vtabHosts[0]);
                             }
                         }
-                    }).then(() => console.log("injected a function"))
+                    }).then(() => {
+                        console.log("injected a function")
+                        chrome.scripting.executeScript({
+                            target: { tabId: tab.id },
+                            files: ['content.js']
+                        });
+                    })
 
                     chrome.scripting.executeScript({
                         target: { tabId: tab.id },
@@ -39,15 +46,25 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
 
 function updateTabsInStorage() {
-    chrome.windows.getAll({ populate: true }, (windows) => {
-        windows.filter(window => window.type === 'normal').forEach((window) => {
-            chrome.storage.local.set({ ['tabs_' + window.id]: window.tabs });
+    console.log('updateTabsInStorage');
+    chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }, (windows) => {
+        windows.forEach((window) => {
+            // chrome.storage.local.set({ ['tabs_' + window.id]: window.tabs });
             // console.log('Tabs updated in storage:', window.id, window.tabs);
-            chrome.storage.local.get('tabs_' + window.id, data => console.log(data))
+            // chrome.storage.local.get('tabs_' + window.id, data => console.log(data))
+            const key = 'tabs_' + window.id;
+            chrome.storage.local.get(key, (data) => {
+                const storedTabs = data[key];
+                if (JSON.stringify(storedTabs) !== JSON.stringify(window.tabs)) {
+                    chrome.storage.local.set({ [key]: window.tabs });
+                    console.log('Tabs updated in storage:', window.id, window.tabs);
+                }
+            });
         });
     });
 }
 
+chrome.tabs.onUpdated.addListener(updateTabsInStorage);
 chrome.tabs.onRemoved.addListener(updateTabsInStorage);
 chrome.tabs.onCreated.addListener(updateTabsInStorage);
 chrome.tabs.onActivated.addListener(updateTabsInStorage);
@@ -58,13 +75,14 @@ chrome.windows.onRemoved.addListener(updateTabsInStorage);
 chrome.windows.onCreated.addListener(updateTabsInStorage);
 
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.status === 'complete') {
-        updateTabsInStorage();
-    }
-});
+// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+//     if (changeInfo.status === 'complete') {
+//         updateTabsInStorage();
+//     }
+// });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log('Received message:', request, sender, sendResponse);
     switch (request.action) {
         case 'activateTab':
             // console.log('Received activateTab message for tabId:', request.tabId);
@@ -129,6 +147,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 // console.log('scrollSidebar set to', request.scrollTop);
             });
             break;
+        case 'returnScrollTopValue':
+            console.log('returnScrollTopValue tab id', sender)
+            chrome.storage.local.get('scrollSidebar', (data) => {
+                if (data?.scrollSidebar?.['window_' + sender.tab.windowId]?.tabId !== sender.tab.id) {
+                    sendResponse({ scrollTop: data?.scrollSidebar?.['window_' + sender.tab.windowId]?.scrollTop || 0 });
+                } else {
+                    sendResponse({ scrollTop: false });
+                }
+            });
+            return true;
         case 'openOptionsPage':
             chrome.runtime.openOptionsPage();
             break;

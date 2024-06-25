@@ -278,6 +278,7 @@ function createSidebar() {
 
 function updateTabList() {
     // 向后台脚本发送消息以获取当前窗口 ID
+    console.log('updateTabList');
     chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
         if (response && response.windowId !== undefined) {
             // 你可以在这里执行其他操作
@@ -382,20 +383,15 @@ function togglePin() {
     });
 }
 
-function scrollSidebar(scrollTop=null) {
+function scrollSidebar(scrollTop = null) {
     if (!scrollTop) {
-        chrome.storage.local.get('scrollSidebar', (data) => {
-            chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
-                scrollTop = data?.scrollSidebar?.['window_' + response.windowId]?.scrollTop || 0;
-                // console.log(scrollTop)
-                if (data?.scrollSidebar?.['window_' + response.windowId]?.tabId !== response.tabId) {
-                    scrollSidebar(scrollTop)
-                }
-            })
+        chrome.runtime.sendMessage({ action: 'returnScrollTopValue' }, (response) => {
+            if (response.scrollTop) scrollSidebar(response.scrollTop);
         })
+    } else {
+        const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
+        sidebar.scrollTo(0, scrollTop);
     }
-    const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
-    sidebar.scrollTo(0, scrollTop);
 }
 
 function sortUnfreezed() {
@@ -416,12 +412,12 @@ togglePin();
 // 暂停100ms后再执行
 setTimeout(() => {
     scrollSidebar();
-}, 10)
+}, 300)
 
 // Update tab list when tabs change
 chrome.storage.onChanged.addListener((changes, namespace) => {
     // 向后台脚本发送消息以获取当前窗口 ID
-    // console.log(changes)
+    console.log('chrome.storage.onChanged: ', changes)
     if (changes.vtab_settings) {
         // console.log('vtab_settings changed');
         sortUnfreezed()
@@ -450,9 +446,9 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    // console.log('Received message:', request);
+    console.log('Received message:', request);
     if (request.action === 'scrollSidebar') {
-        // console.log('Received scrollSidebar message:', request);
+        console.log('Received scrollSidebar message:', request);
         chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
             // console.log('Received GET_WINDOW_ID response:', response);
             if (response && response.windowId !== undefined) {
