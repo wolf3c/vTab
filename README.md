@@ -28,7 +28,7 @@ vTab 给你的浏览器提供一个快如闪电的**侧边栏标签页管理器*
 - 按冻结状态排序（将未冻结的标签页排在顶部，以便轻松访问）;
 - 创建新标签页；
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OWsM3PU7UKA/0.jpg)](https://www.youtube.com/watch?v=OWsM3PU7UKA)
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/lfBjF1tT7rE/0.jpg)](https://www.youtube.com/watch?v=lfBjF1tT7rE)
 
 **TODO List**:
 - [ ] auto archive the tabs not opened long time;
