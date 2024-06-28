@@ -337,8 +337,25 @@ function updateTabList() {
                 const tabs = data['tabs_' + response.windowId] || [];
                 const tabList = host.shadowRoot.getElementById('vtab-list');
                 tabList.innerHTML = '';
+                console.log('time: ', Date.now());
                 tabs
-                    .sort((a, b) => settings.tabsListSortUnfreezed ? a.discarded - b.discarded + (a.status === 'unloaded' ? 1 : 0) - (b.status === 'unloaded' ? 1 : 0) : 0)
+                    .sort((a, b) => {
+                        // 首先比较 discarded
+                        if (a.discarded !== b.discarded) {
+                            return a.discarded - b.discarded;
+                        }
+
+                        // 如果 discarded 相同，比较 status
+                        if (a.status === 'unloaded' && b.status !== 'unloaded') {
+                            return 1;
+                        }
+                        if (a.status !== 'unloaded' && b.status === 'unloaded') {
+                            return -1;
+                        }
+
+                        // 如果 discarded 和 status 都相同，保持原有顺序
+                        return a.originalIndex - b.originalIndex;
+                    })
                     .forEach(tab => {
                         const listItem = document.createElement('li');
                         listItem.className = 'vtab-list-item';
@@ -371,6 +388,7 @@ function updateTabList() {
 
                         tabList.appendChild(listItem);
                     });
+                console.log('time: ', Date.now());
             });
         } else {
             console.error('无法获取窗口ID');
@@ -435,6 +453,7 @@ function togglePin() {
 }
 
 function scrollSidebar(scrollTop = null) {
+    console.log('scrollSidebar', scrollTop)
     if (!scrollTop) {
         chrome.runtime.sendMessage({ action: 'returnScrollTopValue' }, (response) => {
             if (response.scrollTop) scrollSidebar(response.scrollTop);
