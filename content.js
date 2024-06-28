@@ -106,13 +106,17 @@ function createSidebar() {
         border-radius: 5px;
         line-height: 28px;
     }
+
+    .vtab-list-item.active {
+        background-color: #e0e0e0;
+    }
+
     .vtab-list-item:hover {
         background-color: #e0e0e0;
     }
 
     .vtab-list-item.discarded {
         img, span {
-            filter: grayscale(100%);
             opacity: 0.3;
         }
     }
@@ -122,6 +126,7 @@ function createSidebar() {
         height: 16px;
         margin-right: 8px;
     }
+
     .vtab-list-item span {
         flex: 1;
         overflow: hidden;
@@ -141,6 +146,7 @@ function createSidebar() {
         transform: translateY(-50%);
         display: none;
     }
+
     .vtab-list-item:hover button {
         display: block;
     }
@@ -150,6 +156,51 @@ function createSidebar() {
     }
     .discard-button {
         left: 8px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        #vtab-sidebar {
+            background-color: #333; /* Dark background color */
+            color: #f7f7f7; /* Light text color */
+        }
+
+        #operation-area, #footer {
+            background-color: #333;
+            border-color: #444; /* Dark border color */
+        }
+
+        #operation-area button, #footer button {
+            color: #f7f7f7; /* Light text color for buttons */
+        }
+
+        #search-input {
+            background-color: #666; /* Dark background color for search input */
+            color: #f7f7f7; /* Light text color */
+        }
+
+        .vtab-list-item {
+            background-color: #444; /* Darker background for list items */
+            color: #f7f7f7; /* Light text color */
+
+        }
+
+        .vtab-list-item.active {
+            background: #666; /* Darker background for active list items */
+        }
+
+        .vtab-list-item:hover {
+            background-color: #555; /* Even darker background on hover */
+        }
+
+        .vtab-list-item button {
+            background-color: white; /* Button background color */
+            color: black; /* Button text color */
+        }
+        .vtab-list-item.discarded {
+            img, span {
+                opacity: 0.6;
+            }
+        }
     }
 </style>
 `;
@@ -307,7 +358,7 @@ function updateTabList() {
                         listItem.dataset.tabId = tab.id;
 
                         if (tab.active) {
-                            listItem.style.backgroundColor = '#ddd';
+                            listItem.className += ' active';
                         }
 
                         listItem.addEventListener('click', () => {
