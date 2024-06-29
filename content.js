@@ -358,20 +358,24 @@ function updateTabList() {
                 tabs
                     .sort((a, b) => {
                         // 首先比较 discarded
-                        if (a.discarded !== b.discarded) {
-                            return a.discarded - b.discarded;
+                        if (settings.tabsListSortUnfreezed) {
+                            if (a.discarded !== b.discarded) {
+                                return a.discarded - b.discarded;
+                            }
+    
+                            // 如果 discarded 相同，比较 status
+                            if (a.status === 'unloaded' && b.status !== 'unloaded') {
+                                return 1;
+                            }
+                            if (a.status !== 'unloaded' && b.status === 'unloaded') {
+                                return -1;
+                            }
+    
+                            // 如果 discarded 和 status 都相同，保持原有顺序
+                            return a.originalIndex - b.originalIndex;
+                        } else {
+                            return 0
                         }
-
-                        // 如果 discarded 相同，比较 status
-                        if (a.status === 'unloaded' && b.status !== 'unloaded') {
-                            return 1;
-                        }
-                        if (a.status !== 'unloaded' && b.status === 'unloaded') {
-                            return -1;
-                        }
-
-                        // 如果 discarded 和 status 都相同，保持原有顺序
-                        return a.originalIndex - b.originalIndex;
                     })
                     .forEach(tab => {
                         const listItem = document.createElement('li');
