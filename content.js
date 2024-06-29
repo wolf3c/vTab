@@ -24,7 +24,7 @@ chrome.storage.local.get('vtab_settings_rightSidebar', (data) => {
     if (data && data?.vtab_settings_rightSidebar === true) {
         settings.rightSidebar = data?.vtab_settings_rightSidebar;
         console.log('rightSidebar: ', settings.rightSidebar)
-        setSidebarToRight();
+        setSidebarLocal();
     }
 })
 
@@ -41,7 +41,6 @@ function createSidebar() {
     #vtab-sidebar {
         position: fixed;
         top: 0;
-        /* ${settings?.rightSidebar ? 'right' : 'left'}: -240px; */
         width: 250px;
         height: 100%;
         background-color: #f7f7f7; /* Set light gray background */
@@ -215,15 +214,6 @@ function createSidebar() {
 
     const sidebar = document.createElement('div');
     sidebar.id = 'vtab-sidebar';
-    // if (settings?.rightSidebar) {
-    //     sidebar.removeAttribute('left');
-    //     sidebar.style.right = '-240px';
-    // } else {
-    //     sidebar.removeAttribute('right');
-    //     sidebar.style.left = '-240px';
-    // }
-    // sidebar.style.removeAttribute(settings?.rightSidebar ? 'left' : 'right');
-    // sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '-240px';
 
     let isMouseOver = false
     sidebar.addEventListener('mouseenter', () => {
@@ -503,10 +493,12 @@ function sortUnfreezed() {
     })
 }
 
-function setSidebarToRight() {
+function setSidebarLocal() {
     const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
     sidebar.style.removeProperty(settings?.rightSidebar ? 'left' : 'right');
     sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '-240px';
+    sidebar.style.removeProperty('boxShadow');
+    sidebar.style.boxShadow = `${settings?.rightSidebar ? '-' : ''}2px 0 5px rgba(0, 0, 0, 0.2)`;
 }
 
 // Initialize sidebar on page load
@@ -530,7 +522,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     if (changes.vtab_settings_rightSidebar) {
         settings.rightSidebar = changes.vtab_settings_rightSidebar.newValue;
         console.log('vtab_settings_rightSidebar changed', settings.rightSidebar);
-        setSidebarToRight();
+        setSidebarLocal();
     }
     chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
         if (response && response.windowId !== undefined) {
