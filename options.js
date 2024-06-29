@@ -17,6 +17,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const rightSidebar = document.getElementById('right-sidebar');
+    if (rightSidebar) {
+        chrome.storage.local.get('vtab_settings_rightSidebar', (data) => {
+            if (data && data?.vtab_settings_rightSidebar !== undefined) {
+                rightSidebar.checked = data?.vtab_settings_rightSidebar;
+            }
+        })
+
+        rightSidebar.addEventListener('change', (event) => {
+            chrome.storage.local.set({ vtab_settings_rightSidebar: event.target.checked }, () => {
+                console.log('rightSidebar changed:', event.target.checked);
+            })
+        });
+    }
+
     const okButton = document.getElementById('ok-button');
     if (okButton) {
         okButton.addEventListener('click', () => {

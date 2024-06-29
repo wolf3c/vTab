@@ -17,8 +17,16 @@ host.innerHTML = `
 document.body.appendChild(host);
 
 let settings = {
-    tabsListSortUnfreezed: false
+    tabsListSortUnfreezed: false,
 }
+chrome.storage.local.get('vtab_settings_rightSidebar', (data) => {
+    console.log('vtab_settings_rightSidebar', data)
+    if (data && data?.vtab_settings_rightSidebar === true) {
+        settings.rightSidebar = data?.vtab_settings_rightSidebar;
+        console.log('rightSidebar: ', settings.rightSidebar)
+        setSidebarToRight();
+    }
+})
 
 function createSidebar() {
     const shadow = host.attachShadow({ mode: 'open' });
@@ -33,12 +41,12 @@ function createSidebar() {
     #vtab-sidebar {
         position: fixed;
         top: 0;
-        left: -240px;
+        /* ${settings?.rightSidebar ? 'right' : 'left'}: -240px; */
         width: 250px;
         height: 100%;
         background-color: #f7f7f7; /* Set light gray background */
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Add shadow effect */
-        transition: left 0.1s linear;
+        transition: 0.1s linear;
         z-index: 2147483647;
         overflow-y: auto; /* Ensure vertical scrolling if content overflows */
     }
@@ -207,20 +215,29 @@ function createSidebar() {
 
     const sidebar = document.createElement('div');
     sidebar.id = 'vtab-sidebar';
+    // if (settings?.rightSidebar) {
+    //     sidebar.removeAttribute('left');
+    //     sidebar.style.right = '-240px';
+    // } else {
+    //     sidebar.removeAttribute('right');
+    //     sidebar.style.left = '-240px';
+    // }
+    // sidebar.style.removeAttribute(settings?.rightSidebar ? 'left' : 'right');
+    // sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '-240px';
 
     let isMouseOver = false
     sidebar.addEventListener('mouseenter', () => {
         isMouseOver = true;
         const isPinned = sidebar.getAttribute('data-pinned') === 'true';
         if (!isPinned) {
-            sidebar.style.left = '0';
+            sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '0';
         }
     });
     sidebar.addEventListener('mouseleave', () => {
         isMouseOver = false;
         const isPinned = sidebar.getAttribute('data-pinned') === 'true';
         if (!isPinned) {
-            sidebar.style.left = '-240px';
+            sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '-240px';
         }
     });
     sidebar.addEventListener('scrollend', () => {
@@ -441,12 +458,20 @@ function togglePin() {
 
             if (isPinned) {
                 sidebar.setAttribute('data-pinned', 'true');
-                sidebar.style.left = '0';
-                document.body.style.marginLeft = '250px'; // Adjust body margin to make room for sidebar
+                sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '0';
+                if (settings?.rightSidebar) {
+                    document.body.style.width = 'calc(100% - 250px)';
+                } else {
+                    document.body.style.marginLeft = '250px'; // Adjust body margin to make room for sidebar
+                }
             } else {
                 sidebar.setAttribute('data-pinned', 'false');
-                sidebar.style.left = '-240px';
-                document.body.style.marginLeft = '0'; // Reset body margin
+                sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '-240px';
+                if (settings?.rightSidebar) {
+                    document.body.style.width = '100%';
+                } else {
+                    document.body.style.marginLeft = '0'; // Adjust body margin to make room for sidebar
+                }
             }
         }
     });
@@ -474,6 +499,12 @@ function sortUnfreezed() {
     })
 }
 
+function setSidebarToRight() {
+    const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
+    sidebar.style.removeProperty(settings?.rightSidebar ? 'left' : 'right');
+    sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '-240px';
+}
+
 // Initialize sidebar on page load
 createSidebar();
 sortUnfreezed();
@@ -491,6 +522,11 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     if (changes.vtab_settings) {
         // console.log('vtab_settings changed');
         sortUnfreezed()
+    }
+    if (changes.vtab_settings_rightSidebar) {
+        settings.rightSidebar = changes.vtab_settings_rightSidebar.newValue;
+        console.log('vtab_settings_rightSidebar changed', settings.rightSidebar);
+        setSidebarToRight();
     }
     chrome.runtime.sendMessage({ action: 'GET_WINDOW_ID' }, (response) => {
         if (response && response.windowId !== undefined) {
