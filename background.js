@@ -131,7 +131,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case 'checkSidebarPin':
             // console.log('checkSidebarPin')
             chrome.storage.local.get('isSidebarPinned', (data) => {
-                sendResponse({ isSidebarPinned: data?.isSidebarPinned?.['window_' + sender.tab.windowId] });
+                sendResponse({ isSidebarPinned: data?.isSidebarPinned?.['window_' + sender.tab.windowId] || false });
             });
             return true;
         case 'scrollSidebar':
