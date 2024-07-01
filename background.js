@@ -144,25 +144,45 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             return true;
         case 'scrollSidebar':
             // console.log('scrollSidebar tab id', sender.tab.id)
-            chrome.storage.local.set({
-                scrollSidebar: {
-                    ['window_' + sender.tab.windowId]: {
-                        scrollTop: request.scrollTop,
-                        tabId: sender.tab.id
-                    }
+            chrome.storage.local.get('vtab_settings_scrollSidebar', (data) => {
+                console.log('scrollSidebar listener', data)
+                const scroll = {
+                    windowId: sender.tab.windowId,
+                    tabId: sender.tab.id,
+                    scrollTop: request.scrollTop
                 }
-            }, () => {
-                // console.log('scrollSidebar set to', request.scrollTop);
+                let allScroll = data?.vtab_settings_scrollSidebar?.filter(scroll => scroll?.windowId !== sender.tab.windowId) || [];
+                allScroll.push(scroll);
+
+                chrome.storage.local.set({ vtab_settings_scrollSidebar: allScroll }, () => {
+                    // console.log('scrollSidebar set to', request.scrollTop);
+                });
             });
+            // chrome.storage.local.set({
+            //     vtab_settings_scrollSidebar: {
+            //         ['window_' + sender.tab.windowId]: {
+            //             scrollTop: request.scrollTop,
+            //             tabId: sender.tab.id
+            //         }
+            //     }
+            // }, () => {
+            //     // console.log('scrollSidebar set to', request.scrollTop);
+            // });
             break;
         case 'returnScrollTopValue':
             console.log('returnScrollTopValue tab id', sender)
-            chrome.storage.local.get('scrollSidebar', (data) => {
-                if (data?.scrollSidebar?.['window_' + sender.tab.windowId]?.tabId !== sender.tab.id) {
-                    sendResponse({ scrollTop: data?.scrollSidebar?.['window_' + sender.tab.windowId]?.scrollTop || 0 });
+            chrome.storage.local.get('vtab_settings_scrollSidebar', (data) => {
+                let scroll = data?.vtab_settings_scrollSidebar?.find(scroll => scroll?.windowId === sender.tab.windowId)
+                if (scroll?.tabId !== sender.tab.id) {
+                    sendResponse({ scrollTop: scroll?.scrollTop || false });
                 } else {
                     sendResponse({ scrollTop: false });
                 }
+                // if (data?.scrollSidebar?.['window_' + sender.tab.windowId]?.tabId !== sender.tab.id) {
+                //     sendResponse({ scrollTop: data?.scrollSidebar?.['window_' + sender.tab.windowId]?.scrollTop || 0 });
+                // } else {
+                //     sendResponse({ scrollTop: false });
+                // }
             });
             return true;
         case 'openOptionsPage':

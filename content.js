@@ -536,10 +536,10 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
                 // console.log('isSidebarPinned changed');
                 togglePin();
             }
-            if (changes.scrollSidebar) {
-                if (changes.scrollSidebar.newValue?.['window_' + response.windowId] && changes.scrollSidebar.newValue['window_' + response.windowId].tabid !== response.tabId) {
+            if (changes.vtab_settings_scrollSidebar) {
+                if (changes.vtab_settings_scrollSidebar.newValue?.find(scroll => scroll?.windowId === response.windowId)?.tabId !== response.tabId) {
                     // console.log('scrollSidebar changed');
-                    scrollSidebar(changes.scrollSidebar.newValue['window_' + response.windowId].scrollTop);
+                    scrollSidebar(changes.vtab_settings_scrollSidebar.newValue.find(scroll => scroll?.windowId === response.windowId).scrollTop);
                 }
             }
         } else {
