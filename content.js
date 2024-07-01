@@ -532,7 +532,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
             if (changes['tabs_' + response.windowId]) {
                 updateTabList();
             }
-            if (changes.isSidebarPinned) {
+            if (changes.vtab_settings_pinned_windows) {
                 // console.log('isSidebarPinned changed');
                 togglePin();
             }

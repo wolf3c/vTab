@@ -121,17 +121,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             });
             break;
         case 'toggleSidebarPin':
-            chrome.storage.local.get('isSidebarPinned', (data) => {
-                const isPinned = !data?.isSidebarPinned?.['window_' + sender.tab.windowId];
-                chrome.storage.local.set({ isSidebarPinned: { ['window_' + sender.tab.windowId]: isPinned } }, () => {
-                    // console.log('Pin state set to', isPinned);
+            chrome.storage.local.get('vtab_settings_pinned_windows', (data) => {
+                console.log('toggleSidebarPin', data);
+
+                let pinnedWindows = data?.vtab_settings_pinned_windows || [];
+                if (!pinnedWindows.includes(sender.tab.windowId)) {
+                    pinnedWindows.push(sender.tab.windowId);
+                } else {
+                    pinnedWindows = pinnedWindows.filter(windowId => windowId !== sender.tab.windowId);
+                }
+
+                chrome.storage.local.set({ vtab_settings_pinned_windows: pinnedWindows}, () => {
+                    console.log('Pin state set to', pinnedWindows);
                 });
             });
             break;
         case 'checkSidebarPin':
             // console.log('checkSidebarPin')
-            chrome.storage.local.get('isSidebarPinned', (data) => {
-                sendResponse({ isSidebarPinned: data?.isSidebarPinned?.['window_' + sender.tab.windowId] || false });
+            chrome.storage.local.get('vtab_settings_pinned_windows', (data) => {
+                sendResponse({ isSidebarPinned: data?.vtab_settings_pinned_windows?.includes(sender.tab.windowId) || false });
             });
             return true;
         case 'scrollSidebar':
