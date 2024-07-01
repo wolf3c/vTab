@@ -230,7 +230,8 @@ function createSidebar() {
             sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '-240px';
         }
     });
-    sidebar.addEventListener('scrollend', () => {
+    sidebar.addEventListener('scroll', () => {
+    // sidebar.addEventListener('scrollend', () => {
         if (isMouseOver) {
             // console.log('sidebar scroll: ', sidebar.scrollTop);
             chrome.runtime.sendMessage({ action: 'scrollSidebar', scrollTop: sidebar.scrollTop });
