@@ -7,12 +7,10 @@ You can manage browser tabs in the sidebar as fast as lightning.
 It will not have any impact on your current browsing experience.
 
 **feature list**: 
-- manage tabs(check, switch, close) in sidebar smoothly
-- pin the vTab sidebar;
-- search tabs;
+- manage tabs(check, switch, close, new, search) in sidebar smoothly
 - freeze tabs & freeze all tabs in the window (free RAM of you PC);
 - sort by freezed status(show unfreezed tabs together at top for easily access);
-- create new tab;
+- pin the vTab sidebar on left/right of your page;
 
 **Telegram Group**: [vtab users](https://t.me/+QQLV4RqH4940NjNl)
 
@@ -21,12 +19,10 @@ vTab 给你的浏览器提供一个快如闪电的**侧边栏标签页管理器*
 并且，它不会影响你现在的浏览器使用体验。
 
 **功能列表**：
-- 在vTab侧边栏中管理标签页（检查、切换、关闭）
-- 固定vTab侧边栏；
-- 搜索标签页；
+- 在vTab侧边栏中管理标签页（查看、切换、关闭、新建、搜索）
 - 冻结单个标签页和冻结窗口中的所有标签页（可释放内存）；
-- 按冻结状态排序（将未冻结的标签页排在顶部，以便轻松访问）;
-- 创建新标签页；
+- 按冻结状态排序（将未冻结的标签页排在顶部，以便轻松访问）；
+- 将vTab侧边栏固定在页面左侧（或右侧）；
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/lfBjF1tT7rE/0.jpg)](https://www.youtube.com/watch?v=lfBjF1tT7rE)
 
