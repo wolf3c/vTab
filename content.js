@@ -221,6 +221,7 @@ function createSidebar() {
         const isPinned = sidebar.getAttribute('data-pinned') === 'true';
         if (!isPinned) {
             sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '0';
+            chrome.runtime.sendMessage({ action: 'ga', event: 'sidebar_operation', action: 'mouseenter' });
         }
     });
     sidebar.addEventListener('mouseleave', () => {
@@ -228,6 +229,7 @@ function createSidebar() {
         const isPinned = sidebar.getAttribute('data-pinned') === 'true';
         if (!isPinned) {
             sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '-240px';
+            chrome.runtime.sendMessage({ action: 'ga', event: 'sidebar_operation', action: 'mouseleave' });
         }
     });
     sidebar.addEventListener('scroll', () => {
@@ -247,6 +249,7 @@ function createSidebar() {
     freezeAllButton.textContent = '❅ Freeze All';
     freezeAllButton.addEventListener('click', () => {
         chrome.runtime.sendMessage({ action: 'freezeWindowAllTabs' });
+        chrome.runtime.sendMessage({ action: 'ga', event: 'tab_operation', action: 'freezeAll' });
     });
     operationArea.appendChild(freezeAllButton);
     sidebar.appendChild(operationArea);
@@ -258,6 +261,7 @@ function createSidebar() {
     addButton.style.border = 'solid';
     addButton.addEventListener('click', () => {
         chrome.runtime.sendMessage({ action: 'addNewTab', url: '' });
+        chrome.runtime.sendMessage({ action: 'ga', event: 'tab_operation', action: 'tab_new' });
     });
     operationArea.appendChild(addButton);
 
@@ -267,6 +271,7 @@ function createSidebar() {
     pinButton.textContent = '📌 Pin';
     pinButton.addEventListener('click', () => {
         chrome.runtime.sendMessage({ action: 'toggleSidebarPin' });
+        chrome.runtime.sendMessage({ action: 'ga', event: 'sidebar_operation', action: 'toggle_' + pinButton.textContent });
     });
 
     operationArea.appendChild(pinButton);
@@ -290,6 +295,9 @@ function createSidebar() {
             }
         });
     });
+    searchInput.addEventListener('focus', () => {
+        chrome.runtime.sendMessage({ action: 'ga', event: 'sidebar_operation', action: 'search' });
+    })
 
     sidebar.appendChild(searchInput);
 
@@ -307,6 +315,7 @@ function createSidebar() {
     githubButton.textContent = '🏚️ Github';
     githubButton.addEventListener('click', () => {
         window.open('https://github.com/wolf3c/vTab', '_blank');
+        chrome.runtime.sendMessage({ action: 'ga', event: 'link', action: 'github' });
     });
     footer.appendChild(githubButton);
 
@@ -315,6 +324,7 @@ function createSidebar() {
     supportButton.textContent = '❤️ Support';
     supportButton.addEventListener('click', () => {
         window.open('https://www.buymeacoffee.com/wolf3cg', '_blank');
+        chrome.runtime.sendMessage({ action: 'ga', event: 'link', action: 'support' });
     });
     footer.appendChild(supportButton);
 
@@ -323,6 +333,7 @@ function createSidebar() {
     settingsButton.textContent = '⚙️ Settings';
     settingsButton.addEventListener('click', () => {
         chrome.runtime.sendMessage({ action: 'openOptionsPage' });
+        chrome.runtime.sendMessage({ action: 'ga', event: 'link', action: 'options' });
     });
     footer.appendChild(settingsButton);
 
@@ -393,6 +404,7 @@ function updateTabList() {
                         listItem.addEventListener('click', () => {
                             // console.log('Tab item clicked', listItem.dataset.tabId);
                             chrome.runtime.sendMessage({ action: 'activateTab', tabId: parseInt(listItem.dataset.tabId) });
+                            chrome.runtime.sendMessage({ action: 'ga', event: 'tab_operation', action: 'tab_click' });
                         });
 
                         addCloseButton(listItem); // Add close button to each tab item
@@ -417,6 +429,7 @@ function updateTabList() {
             event.stopPropagation(); // 防止点击关闭按钮时激活标签
             const tabId = parseInt(listItem.dataset.tabId);
             chrome.runtime.sendMessage({ action: 'closeTab', tabId: tabId });
+            chrome.runtime.sendMessage({ action: 'ga', event: 'tab_operation', action: 'tab_close' });
         });
 
         listItem.appendChild(closeButton);
@@ -431,6 +444,7 @@ function updateTabList() {
             event.stopPropagation(); // 防止点击关闭按钮时激活标签
             const tabId = parseInt(listItem.dataset.tabId);
             chrome.runtime.sendMessage({ action: 'discardTab', tabId: tabId });
+            chrome.runtime.sendMessage({ action: 'ga', event: 'tab_operation', action: 'tab_discard' });
         });
 
         listItem.appendChild(discardButton);

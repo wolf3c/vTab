@@ -1,16 +1,24 @@
+import Analytics from './google-analytics.js';
+
+
 if (chrome.runtime.getManifest().isReleased) {
     console.log = function () { };
 }
 
+
 chrome.runtime.onInstalled.addListener(function (details) {
     console.log("vtab extension installed.");
+
 
     // updateTabsInStorage();
 
     // register content script when extension is updated
     if (details.reason === 'update' || details.reason === 'install') {
         chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }, (windows) => {
+
             console.log('windows: ', windows)
+            Analytics.fireEvent('install&update', { windows_num: windows.length });
+
             windows.forEach((window) => {
                 // console.log('window: ', window)
                 window.tabs.filter(tab => tab.status != 'unloaded' && tab.discarded === false).forEach((tab) => {
@@ -131,7 +139,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     pinnedWindows = pinnedWindows.filter(windowId => windowId !== sender.tab.windowId);
                 }
 
-                chrome.storage.local.set({ vtab_settings_pinned_windows: pinnedWindows}, () => {
+                chrome.storage.local.set({ vtab_settings_pinned_windows: pinnedWindows }, () => {
                     console.log('Pin state set to', pinnedWindows);
                 });
             });
@@ -187,6 +195,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             return true;
         case 'openOptionsPage':
             chrome.runtime.openOptionsPage();
+            break;
+        case 'ga':
+            console.log('GA:', request.event, request.category, request.action, request.label, request.value);
+            Analytics.fireEvent(request.event, {
+                category: request.category,
+                action: request.action,
+                label: request.label,
+                value: request.value
+            });
             break;
         default:
             break;

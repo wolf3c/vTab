@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sortUnfreezed.addEventListener('change', (event) => {
             chrome.storage.local.set({ vtab_settings: { sortUnfreezed: event.target.checked } }, () => {
                 console.log('sortUnfreezed changed:', event.target.checked);
+                chrome.runtime.sendMessage({ action: 'ga', event: 'settings', action: 'sortUnfreezed', value: event.target.checked });
             })
         });
     }
@@ -28,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rightSidebar.addEventListener('change', (event) => {
             chrome.storage.local.set({ vtab_settings_rightSidebar: event.target.checked }, () => {
                 console.log('rightSidebar changed:', event.target.checked);
+                chrome.runtime.sendMessage({ action: 'ga', event: 'settings', action: 'rightSidebar', value: event.target.checked });
             })
         });
     }
