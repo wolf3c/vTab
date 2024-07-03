@@ -40,11 +40,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
                             files: ['content.js']
                         });
                     })
-
-                    chrome.scripting.executeScript({
-                        target: { tabId: tab.id },
-                        files: ['content.js']
-                    });
                 })
             });
         });
