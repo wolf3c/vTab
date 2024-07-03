@@ -31,6 +31,7 @@
                 "<all_urls>",
                 "*://*/*"
             ],
+            "match_origin_as_fallback": true,
             "match_about_blank": true,
             "js": [
                 "content.js"
