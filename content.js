@@ -320,13 +320,22 @@ function createSidebar() {
     footer.appendChild(githubButton);
 
     // Create '❤️ Support Me' button
-    const supportButton = document.createElement('button');
-    supportButton.textContent = '❤️ Support';
-    supportButton.addEventListener('click', () => {
-        window.open('https://www.buymeacoffee.com/wolf3cg', '_blank');
-        chrome.runtime.sendMessage({ action: 'ga', event: 'link', action: 'support' });
+    // const supportButton = document.createElement('button');
+    // supportButton.textContent = '❤️ Support';
+    // supportButton.addEventListener('click', () => {
+    //     window.open('https://www.buymeacoffee.com/wolf3cg', '_blank');
+    //     chrome.runtime.sendMessage({ action: 'ga', event: 'link', action: 'support' });
+    // });
+    // footer.appendChild(supportButton);
+
+    // Create '❤️ Archived Manager' button
+    const archivedButton = document.createElement('button');
+    archivedButton.textContent = '🗄️ Archived';
+    archivedButton.addEventListener('click', () => {
+        chrome.runtime.sendMessage({ action: 'openArchivedManager' });
+        chrome.runtime.sendMessage({ action: 'ga', event: 'link', action: 'archived' });
     });
-    footer.appendChild(supportButton);
+    footer.appendChild(archivedButton);
 
     // Create 'settings' button
     const settingsButton = document.createElement('button');

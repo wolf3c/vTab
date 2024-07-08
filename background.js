@@ -67,8 +67,16 @@ function updateTabsInStorage() {
     });
 }
 
+
+let isRemovingTabs = false;
 chrome.tabs.onUpdated.addListener(updateTabsInStorage);
-chrome.tabs.onRemoved.addListener(updateTabsInStorage);
+chrome.tabs.onRemoved.addListener(() => {
+    updateTabsInStorage();
+    autoFreezeTabs();
+    if (!isRemovingTabs) {
+        autoArchiveTabs();
+    }
+});
 chrome.tabs.onCreated.addListener(updateTabsInStorage);
 chrome.tabs.onActivated.addListener(updateTabsInStorage);
 chrome.tabs.onDetached.addListener(updateTabsInStorage);
@@ -77,6 +85,54 @@ chrome.windows.onFocusChanged.addListener(updateTabsInStorage);
 chrome.windows.onRemoved.addListener(updateTabsInStorage);
 chrome.windows.onCreated.addListener(updateTabsInStorage);
 
+const autoArchiveDDL = 7 * 24 * 60 * 60 * 1000;
+const autoFreezeDDL = 36 * 60 * 60 * 1000;
+
+function autoFreezeTabs() {
+    chrome.storage.local.get('vtab_settings_autoFreeze', (data) => {
+        if (data && data?.vtab_settings_autoFreeze === true) {
+            chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }, (windows) => {
+                windows.forEach((window) => {
+                    window.tabs.filter(tab => tab.pinned === false && tab.discarded === false && tab.status === 'complete' && tab.active === false && tab.lastAccessed < Date.now() - autoFreezeDDL).forEach((tab) => {
+                        chrome.tabs.discard(tab.id);
+                    });
+                });
+                updateTabsInStorage();
+            });
+        }
+    })
+}
+
+function autoArchiveTabs() {
+    console.log('autoArchiveTabs');
+    isRemovingTabs = true;
+    chrome.storage.local.get('vtab_settings_autoArchive', (data) => {
+        if (data && data?.vtab_settings_autoArchive === true) {
+            let archivedTabs = [];
+            chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }, (windows) => {
+                windows.forEach((window) => {
+                    console.log('autoArchiveTabs - window: ', window)
+                    window.tabs.filter(tab => tab.pinned === false && tab.active === false && tab.lastAccessed < Date.now() - autoArchiveDDL).forEach((tab) => {
+                        archivedTabs.push(tab);
+                    });
+                });
+
+                chrome.storage.local.get('vtab_archivedTabs', (data) => {
+                    let vtab_archivedTabs = data?.vtab_archivedTabs || [];
+                    archivedTabs = archivedTabs.filter(tab => !vtab_archivedTabs.find(t => t.id === tab.id));
+                    vtab_archivedTabs = vtab_archivedTabs.concat(archivedTabs);
+
+                    chrome.storage.local.set({ vtab_archivedTabs }, () => {
+                        archivedTabs.forEach(tab => chrome.tabs.remove(tab.id));
+
+                        updateTabsInStorage();
+                        isRemovingTabs = false;
+                    })
+                })
+            });
+        }
+    })
+}
 
 // chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 //     if (changeInfo.status === 'complete') {
@@ -190,6 +246,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             return true;
         case 'openOptionsPage':
             chrome.runtime.openOptionsPage();
+            break;
+        case 'openArchivedManager':
+            chrome.tabs.create({ url: chrome.runtime.getURL('archived_manager/archived_manager.html') });
+            break;
+        case 'removeArchivedTab':
+            chrome.storage.local.get('vtab_archivedTabs', (data) => {
+                let vtab_archivedTabs = data?.vtab_archivedTabs || [];
+                vtab_archivedTabs = vtab_archivedTabs.filter(tab => tab?.id !== request.tabId);
+
+                chrome.storage.local.set({ vtab_archivedTabs }, () => {
+                    console.log('Archived tab removed:', request.tabId);
+                });
+            })
             break;
         case 'ga':
             console.log('GA:', request.event, request.category, request.action, request.label, request.value);
