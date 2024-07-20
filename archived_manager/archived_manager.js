@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', function () {
             let filteredTabs = tabs.filter(tab => tab.title.toLowerCase().includes(query));
             renderList(filteredTabs, archiveList);
         });
+
+        let title = document.getElementById('title');
+        title.innerText = `Archived Tabs Manager (${tabs.length})`;
     })
 });
 
