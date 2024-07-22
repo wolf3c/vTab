@@ -6,6 +6,11 @@ You can manage browser tabs in the sidebar as fast as lightning.
 
 It will not have any impact on your current browsing experience.
 
+
+<a href="https://chromewebstore.google.com/detail/vtab/fkmcgnjikengcgbeadhmdeneagpdgaea" target="_blank">
+<img src="images/chrome_web_store_logo.png" width="160" alt="buymeacoffee" />
+</a>
+
 **feature list**: 
 - manage tabs(check, switch, close, new, search) in sidebar smoothly
 - freeze tabs & freeze all tabs in the window (free RAM of you PC);
@@ -30,13 +35,14 @@ vTab 给你的浏览器提供一个快如闪电的**侧边栏标签页管理器*
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/lfBjF1tT7rE/0.jpg)](https://www.youtube.com/watch?v=lfBjF1tT7rE)
 
-**TODO List**:
-- [x] auto archive the tabs not opened long time;
+# How to Install 
 
+1. **[Install from Chrome Web Store](https://chromewebstore.google.com/detail/vtab/fkmcgnjikengcgbeadhmdeneagpdgaea)**
+<a href="https://chromewebstore.google.com/detail/vtab/fkmcgnjikengcgbeadhmdeneagpdgaea" target="_blank">
+<img src="images/chrome_web_store_logo.png" width="160" alt="buymeacoffee" />
+</a>
 
-# How to install
-
-[Chrome web store](https://chromewebstore.google.com/detail/vtab/fkmcgnjikengcgbeadhmdeneagpdgaea) 
+2. **[Install from releases](https://github.com/wolf3c/vTab/releases)**
 
 # Why develop this new vertical tab manager?
 
