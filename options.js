@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sortUnfreezed.addEventListener('change', (event) => {
             chrome.storage.local.set({ vtab_settings: { sortUnfreezed: event.target.checked } }, () => {
                 console.log('sortUnfreezed changed:', event.target.checked);
-                chrome.runtime.sendMessage({ action: 'ga', event: 'settings', action: 'sortUnfreezed', value: event.target.checked });
+                chrome.runtime.sendMessage({ action: 'ga', label: 'settings', event: 'sortUnfreezed', value: event.target.checked });
             })
         });
     }
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rightSidebar.addEventListener('change', (event) => {
             chrome.storage.local.set({ vtab_settings_rightSidebar: event.target.checked }, () => {
                 console.log('rightSidebar changed:', event.target.checked);
-                chrome.runtime.sendMessage({ action: 'ga', event: 'settings', action: 'rightSidebar', value: event.target.checked });
+                chrome.runtime.sendMessage({ action: 'ga', label: 'settings', event: 'rightSidebar', value: event.target.checked });
             })
         });
     }
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         autoFreezeSetting.addEventListener('change', (event) => {
             chrome.storage.local.set({ vtab_settings_autoFreeze: event.target.checked }, () => {
-                chrome.runtime.sendMessage({ action: 'ga', event: 'settings', action: 'autoFreeze', value: event.target.checked });
+                chrome.runtime.sendMessage({ action: 'ga', label: 'settings', event: 'autoFreeze', value: event.target.checked });
             })
         });
     }
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         autoArchiveSetting.addEventListener('change', (event) => {
             chrome.storage.local.set({ vtab_settings_autoArchive: event.target.checked }, () => {
-                chrome.runtime.sendMessage({ action: 'ga', event: 'settings', action: 'autoArchive', value: event.target.checked });
+                chrome.runtime.sendMessage({ action: 'ga', label: 'settings', event: 'autoArchive', value: event.target.checked });
             })
         });
     }

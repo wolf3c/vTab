@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let title = document.getElementById('title');
         title.innerText = `Archived Tabs Manager (${tabs.length})`;
     })
+    chrome.runtime.sendMessage({ action: 'ga', event: 'show', label: 'archived_manager' });
 });
 
 // 渲染标签列表的函数
@@ -36,6 +37,7 @@ function renderList(tabs, archiveList) {
         title.innerText = tab.title;
         title.addEventListener('click', () => {
             window.open(tab.url, '_blank');
+            chrome.runtime.sendMessage({ action: 'ga', event: 'open_tab', label: 'archived_manager' });
         });
         listItem.dataset.tabId = tab.id
         listItem.appendChild(favicon);
@@ -56,7 +58,7 @@ function renderList(tabs, archiveList) {
                 chrome.runtime.sendMessage({ action: 'removeArchivedTab', tabId: tabId });
                 console.log('Removed archived tab:', tabId);
             }
-            // chrome.runtime.sendMessage({ action: 'ga', event: 'tab_operation', action: 'tab_close' });
+            chrome.runtime.sendMessage({ action: 'ga', event: 'remove_tab', label: 'archived_manager' });
         });
 
         listItem.appendChild(closeButton);

@@ -261,15 +261,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             })
             break;
         case 'ga':
-            console.log('GA:', request.event, request.category, request.action, request.label, request.value);
+            console.log('GA:', request?.event, request?.category, request?.action, request?.label, request?.value);
             Analytics.fireEvent(request.event, {
-                category: request.category,
-                action: request.action,
-                label: request.label,
-                value: request.value
+                category: request?.category,
+                label: request?.label,
+                value: request?.value
             });
             break;
         default:
+            console.log('messages default')
             break;
     }
 });
