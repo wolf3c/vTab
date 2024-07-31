@@ -23,7 +23,6 @@ chrome.storage.local.get('vtab_settings_rightSidebar', (data) => {
     console.log('vtab_settings_rightSidebar', data)
     if (data && data?.vtab_settings_rightSidebar === true) {
         settings.rightSidebar = data?.vtab_settings_rightSidebar;
-        console.log('rightSidebar: ', settings.rightSidebar)
         setSidebarLocal();
     }
 })
@@ -214,6 +213,7 @@ function createSidebar() {
 
     const sidebar = document.createElement('div');
     sidebar.id = 'vtab-sidebar';
+    sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '-240px';
 
     let isMouseOver = false
     sidebar.addEventListener('mouseenter', () => {
