@@ -12,13 +12,13 @@ It will not have any impact on your current browsing experience.
 </a>
 
 **feature list**: 
-- manage tabs(check, switch, close, new, search) in sidebar smoothly
-- freeze tabs & freeze all tabs in the window (free RAM of you PC);
-- **sort by freezed status**(show unfreezed tabs together at top for easily access);
-- **sort by URL/host**(show same host websit together);
-- pin the vTab sidebar on left/right of your page;
-- **freeze tabs that inactive for 36 hours automatically**;
-- archive tabs that inactive for 7 days automatically;
+- ⚙️ manage tabs(check, switch, close, new, search) in sidebar smoothly
+- ❄️ freeze tabs & freeze all tabs in the window (free RAM of you PC);
+- 🥳 **SORT by freezed status**(show unfreezed tabs together at top for easily access);
+- 🎉 **SORT by URL/host**(show same host websit together);
+- 📌 pin the vTab sidebar on left/right of your page;
+- ❄️ **freeze tabs that inactive for 36 hours automatically**;
+- ❌ archive tabs that inactive for 7 days automatically;
 
 **Telegram Group**: [vtab users](https://t.me/+QQLV4RqH4940NjNl)
 
@@ -27,13 +27,13 @@ vTab 给你的浏览器提供一个快如闪电的**侧边栏标签页管理器*
 并且，它不会影响你现在的浏览器使用体验。
 
 **功能列表**：
-- 在任意网页中通过vTab侧边栏管理标签页（查看、切换、关闭、新建、搜索）
-- **冻结**单个标签页和冻结窗口中的所有标签页（可释放内存）；
-- **按冻结状态排序**（将未冻结的标签页排在顶部，以便轻松访问）；
-- **按照网站排序**（相同域名会排在一起）；
-- 将vTab侧边栏固定在页面左侧（或右侧）；
-- **自动冻结**36小时未活跃的选项卡；
-- 自动归档7天未活跃的选项卡；
+- ⚙️ 在任意网页中通过vTab侧边栏管理标签页（查看、切换、关闭、新建、搜索）
+- ❄️ **冻结**单个标签页和冻结窗口中的所有标签页（可释放内存）；
+- 🥳 **按冻结状态排序**（将未冻结的标签页排在顶部，以便轻松访问）；
+- 🎉 **按照网站排序**（相同域名会排在一起）；
+- 📌 将vTab侧边栏固定在页面左侧（或右侧）；
+- ❄️ **自动冻结**36小时未活跃的选项卡；
+- ❌ 自动归档7天未活跃的选项卡；
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/lfBjF1tT7rE/0.jpg)](https://www.youtube.com/watch?v=lfBjF1tT7rE)
 
