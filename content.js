@@ -16,15 +16,14 @@ host.innerHTML = `
 `;
 document.body.appendChild(host);
 
-let settings = {
-    tabsListSortUnfreezed: false,
-}
-chrome.storage.local.get('vtab_settings_rightSidebar', (data) => {
-    console.log('vtab_settings_rightSidebar', data)
-    if (data && data?.vtab_settings_rightSidebar === true) {
-        settings.rightSidebar = data?.vtab_settings_rightSidebar;
-        setSidebarLocal();
-    }
+let settings = {};
+
+chrome.storage.local.get(['vtab_settings_sortUnfreezed', 'vtab_settings_sortByHost', 'vtab_settings_rightSidebar'], (data) => {
+    console.log(data)
+    settings.sortUnfreezed = data?.vtab_settings_sortUnfreezed || false;
+    settings.sortByHost = data?.vtab_settings_sortByHost || false;
+    settings.rightSidebar = data?.vtab_settings_rightSidebar || false;
+    if (settings.rightSidebar) setSidebarLocal();
 })
 
 function createSidebar() {
@@ -233,7 +232,7 @@ function createSidebar() {
         }
     });
     sidebar.addEventListener('scroll', () => {
-    // sidebar.addEventListener('scrollend', () => {
+        // sidebar.addEventListener('scrollend', () => {
         if (isMouseOver) {
             // console.log('sidebar scroll: ', sidebar.scrollTop);
             chrome.runtime.sendMessage({ action: 'scrollSidebar', scrollTop: sidebar.scrollTop });
@@ -368,23 +367,41 @@ function updateTabList() {
                 console.log('time: ', Date.now());
                 tabs
                     .sort((a, b) => {
+                        console.log(settings)
                         // 首先比较 discarded
-                        if (settings.tabsListSortUnfreezed) {
+                        if (settings?.sortUnfreezed) {
                             if (a.discarded !== b.discarded) {
                                 return a.discarded - b.discarded;
                             }
-    
+
                             // 如果 discarded 相同，比较 status
-                            if (a.status === 'unloaded' && b.status !== 'unloaded') {
-                                return 1;
+                            if (a.status !== b.status) {
+                                if (a.status === 'unloaded' && b.status !== 'unloaded') {
+                                    return 1;
+                                }
+                                if (a.status !== 'unloaded' && b.status === 'unloaded') {
+                                    return -1;
+                                }
                             }
-                            if (a.status !== 'unloaded' && b.status === 'unloaded') {
-                                return -1;
+
+                            // 如果 discarded 和 status 都相同，再按 host 排序
+                            if (settings?.sortByHost) {
+                                // 如果 freezed 相同，再按 host 排序
+                                const hostA = new URL(a.url).host;
+                                const hostB = new URL(b.url).host;
+                                return hostA.localeCompare(hostB);
                             }
-    
-                            // 如果 discarded 和 status 都相同，保持原有顺序
+
+                            // 如果以上都相同，保持原顺序
                             return a.originalIndex - b.originalIndex;
+                            // return 0
                         } else {
+                            // 按 host 排序
+                            if (settings?.sortByHost) {
+                                const hostA = new URL(a.url).host;
+                                const hostB = new URL(b.url).host;
+                                return hostA.localeCompare(hostB);
+                            }
                             return 0
                         }
                     })
@@ -509,15 +526,22 @@ function scrollSidebar(scrollTop = null) {
 
 function sortUnfreezed() {
     chrome.storage.local.get('vtab_settings', (data) => {
+        settings.sortUnfreezed = data?.vtab_settings_sortUnfreezed;
+        updateTabList();
+    })
+}
+function sortByHost() {
+    chrome.storage.local.get('vtab_settings', (data) => {
         // console.log('vtab_settings', data)
-        if (data && data?.vtab_settings?.sortUnfreezed !== undefined) {
-            settings.tabsListSortUnfreezed = data?.vtab_settings?.sortUnfreezed;
+        if (data && data?.vtab_settings?.sortByHost !== undefined) {
+            settings.sortByHost = data?.vtab_settings?.sortByHost;
             updateTabList();
         }
     })
 }
 
 function setSidebarLocal() {
+    console.log('setSidebarLocal right')
     const sidebar = host.shadowRoot.getElementById('vtab-sidebar');
     sidebar.style.removeProperty(settings?.rightSidebar ? 'left' : 'right');
     sidebar.style[settings?.rightSidebar ? 'right' : 'left'] = '-240px';
@@ -527,7 +551,7 @@ function setSidebarLocal() {
 
 // Initialize sidebar on page load
 createSidebar();
-sortUnfreezed();
+// sortUnfreezed();
 // updateTabList();
 togglePin();
 // 暂停100ms后再执行
@@ -539,9 +563,17 @@ setTimeout(() => {
 chrome.storage.onChanged.addListener((changes, namespace) => {
     // 向后台脚本发送消息以获取当前窗口 ID
     console.log('chrome.storage.onChanged: ', changes)
-    if (changes.vtab_settings) {
-        // console.log('vtab_settings changed');
-        sortUnfreezed()
+    // if (changes.vtab_settings) {
+    //     // console.log('vtab_settings changed');
+    //     sortUnfreezed()
+    // }
+    if (changes.vtab_settings_sortUnfreezed) {
+        settings.sortUnfreezed = changes.vtab_settings_sortUnfreezed.newValue;
+        updateTabList()
+    }
+    if (changes.vtab_settings_sortByHost) {
+        settings.sortByHost = changes.vtab_settings_sortByHost.newValue;
+        updateTabList()
     }
     if (changes.vtab_settings_rightSidebar) {
         settings.rightSidebar = changes.vtab_settings_rightSidebar.newValue;
