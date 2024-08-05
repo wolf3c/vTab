@@ -18,7 +18,7 @@ It will not have any impact on your current browsing experience.
 - 🎉 **SORT by URL/host**(show same host websit together);
 - 📌 pin the vTab sidebar on left/right of your page;
 - ❄️ **freeze tabs that inactive for 36 hours automatically**;
-- ❌ archive tabs that inactive for 7 days automatically;
+- ️🗃️ archive tabs that inactive for 7 days automatically;
 
 **Telegram Group**: [vtab users](https://t.me/+QQLV4RqH4940NjNl)
 
@@ -33,7 +33,7 @@ vTab 给你的浏览器提供一个快如闪电的**侧边栏标签页管理器*
 - 🎉 **按照网站排序**（相同域名会排在一起）；
 - 📌 将vTab侧边栏固定在页面左侧（或右侧）；
 - ❄️ **自动冻结**36小时未活跃的选项卡；
-- ❌ 自动归档7天未活跃的选项卡；
+- 🗃️️ 自动归档7天未活跃的选项卡；
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/lfBjF1tT7rE/0.jpg)](https://www.youtube.com/watch?v=lfBjF1tT7rE)
 
