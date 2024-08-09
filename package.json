@@ -1,0 +1,21 @@
+{
+	"name": "vtab3",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview"
+	},
+	"devDependencies": {
+		"@crxjs/vite-plugin": "^2.0.0-beta.25",
+		"@sveltejs/adapter-auto": "^3.0.0",
+		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/vite-plugin-svelte": "^3.0.0",
+		"@types/chrome": "^0.0.269",
+		"svelte": "^4.2.7",
+		"sveltekit-adapter-chrome-extension": "^2.0.1",
+		"vite": "^5.0.3"
+	},
+	"type": "module"
+}

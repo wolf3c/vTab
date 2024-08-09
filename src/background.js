@@ -17,7 +17,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
         chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }, (windows) => {
 
             console.log('windows: ', windows)
-            Analytics.fireEvent('install&update', { windows_num: windows.length });
 
             windows.forEach((window) => {
                 // console.log('window: ', window)
@@ -37,11 +36,13 @@ chrome.runtime.onInstalled.addListener(function (details) {
                         console.log("injected a function")
                         chrome.scripting.executeScript({
                             target: { tabId: tab.id },
-                            files: ['content.js']
+                            files: chrome.runtime.getManifest().content_scripts[0].js
                         });
                     })
                 })
             });
+
+            Analytics.fireEvent('install&update', { windows_num: windows.length });
         });
 
     }
@@ -195,12 +196,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 });
             });
             break;
-        case 'checkSidebarPin':
-            // console.log('checkSidebarPin')
-            chrome.storage.local.get('vtab_settings_pinned_windows', (data) => {
-                sendResponse({ isSidebarPinned: data?.vtab_settings_pinned_windows?.includes(sender.tab.windowId) || false });
-            });
-            return true;
         case 'scrollSidebar':
             // console.log('scrollSidebar tab id', sender.tab.id)
             chrome.storage.local.get('vtab_settings_scrollSidebar', (data) => {
@@ -248,7 +243,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             chrome.runtime.openOptionsPage();
             break;
         case 'openArchivedManager':
-            chrome.tabs.create({ url: chrome.runtime.getURL('archived_manager/archived_manager.html') });
+            chrome.tabs.create({ url: chrome.runtime.getURL('/src/popup/popup.html') });
+            // chrome.tabs.create({ url: chrome.runtime.getURL('/src/archived_manager/archived_manager.html') });
             break;
         case 'removeArchivedTab':
             chrome.storage.local.get('vtab_archivedTabs', (data) => {
