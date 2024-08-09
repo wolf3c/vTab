@@ -308,9 +308,7 @@
                 chrome.storage.local.get(
                     `tabs_${response.windowId}`,
                     (data) => {
-                        tabs = (data[`tabs_${response.windowId}`] || []).sort(
-                            sortTabs,
-                        );
+                        tabs = sortTabs(data[`tabs_${response.windowId}`], tabs);
                     },
                 );
             } else {
@@ -319,43 +317,27 @@
         });
     }
 
-    function sortTabs(a, b) {
-        // 排序逻辑...
+    function sortTabs(tabs) {
+        let activeTabs = [];
+        let freezedTabs = [];
         if (settings?.sortUnfreezed) {
-            if (a.discarded !== b.discarded) {
-                return a.discarded - b.discarded;
-            }
-
-            // 如果 discarded 相同，比较 status
-            if (a.status !== b.status) {
-                if (a.status === "unloaded" && b.status !== "unloaded") {
-                    return 1;
-                }
-                if (a.status !== "unloaded" && b.status === "unloaded") {
-                    return -1;
-                }
-            }
-
-            // 如果 discarded 和 status 都相同，再按 host 排序
-            if (settings?.sortByHost) {
-                // 如果 freezed 相同，再按 host 排序
-                const hostA = new URL(a.url).host;
-                const hostB = new URL(b.url).host;
-                return hostA.localeCompare(hostB);
-            }
-
-            // 如果以上都相同，保持原顺序
-            return a.originalIndex - b.originalIndex;
-            // return 0
+            activeTabs = tabs.filter(tab => tab.discarded === false && tab.status !== "unloaded");
+            freezedTabs = tabs.filter(tab => tab.discarded === true || tab.status === "unloaded");
         } else {
-            // 按 host 排序
-            if (settings?.sortByHost) {
-                const hostA = new URL(a.url).host;
-                const hostB = new URL(b.url).host;
-                return hostA.localeCompare(hostB);
-            }
-            return 0;
+            activeTabs = tabs;
         }
+
+        if (settings?.sortByHost) {
+            activeTabs = sortTabsByHost(activeTabs);
+            freezedTabs = sortTabsByHost(freezedTabs);
+        }
+        return activeTabs.concat(freezedTabs);
+    }
+
+    function sortTabsByHost(tabs) {
+        const hosts = tabs.map(tab => new URL(tab.url).host);
+        const uniqueHosts = [...new Set(hosts)];
+        return tabs.sort((a, b) => uniqueHosts.indexOf(new URL(a.url).host) - uniqueHosts.indexOf(new URL(b.url).host));
     }
 
     function setSidebarLocal() {
