@@ -273,21 +273,21 @@
                 }
 
                 console.log("settings", settings);
-                isPinned = data?.vtab_settings_pinned_windows?.includes(windowId);
+                // isPinned = data?.vtab_settings_pinned_windows?.includes(windowId);
                 
-                // chrome.runtime.sendMessage(
-                //     { action: "GET_WINDOW_ID" },
-                //     (response) => {
-                //         console.log("response", response);
-                //         if (response && response.windowId !== undefined) {
-                //             isPinned =
-                //                 data?.vtab_settings_pinned_windows?.includes(
-                //                     response.windowId,
-                //                 );
-                //             console.log("isPinned", isPinned);
-                //         }
-                //     },
-                // );
+                chrome.runtime.sendMessage(
+                    { action: "GET_WINDOW_ID" },
+                    (response) => {
+                        console.log("response", response);
+                        if (response && response.windowId !== undefined) {
+                            isPinned =
+                                data?.vtab_settings_pinned_windows?.includes(
+                                    response.windowId,
+                                );
+                            console.log("isPinned", isPinned);
+                        }
+                    },
+                );
             },
         );
     }
