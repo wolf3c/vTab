@@ -39,12 +39,12 @@ vTab 给你的浏览器提供一个快如闪电的**侧边栏标签页管理器*
 
 # How to Install 
 
-1. **[Install from Chrome Web Store](https://chromewebstore.google.com/detail/vtab/fkmcgnjikengcgbeadhmdeneagpdgaea)**
+- **[Install from Chrome Web Store](https://chromewebstore.google.com/detail/vtab/fkmcgnjikengcgbeadhmdeneagpdgaea)**
 <a href="https://chromewebstore.google.com/detail/vtab/fkmcgnjikengcgbeadhmdeneagpdgaea" target="_blank">
 <img src="images/chrome_web_store_logo.png" width="160" alt="buymeacoffee" />
 </a>
 
-2. **[Install from releases](https://github.com/wolf3c/vTab/releases)**
+- **[Install from releases](https://github.com/wolf3c/vTab/releases)**
 
 # Why develop this new vertical tab manager?
 
