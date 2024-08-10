@@ -220,12 +220,6 @@ function autoArchiveTabs() {
     })
 }
 
-// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-//     if (changeInfo.status === 'complete') {
-//         updateTabsInStorage();
-//     }
-// });
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('Received message:', request, sender, sendResponse);
     switch (request.action) {
