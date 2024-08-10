@@ -13,8 +13,8 @@
     let isMouseOver = false;
     let isPinned = false;
     let searchTerm = "";
-    let tabs = [];
     let sidebar;
+    let windowId = null;
 
     $: sidebarStyle = {
         [settings?.rightSidebar ? "right" : "left"]: isPinned ? "0" : "-240px",
@@ -24,15 +24,14 @@
 
     onMount(() => {
         try {
+            getWindowId();
             createHost();
             loadSettings();
-            updateTabList();
             setTimeout(() => {
                 scrollSidebar();
             }, 300);
 
             chrome.storage.onChanged.addListener(handleStorageChanges);
-            chrome.runtime.onMessage.addListener(handleRuntimeMessages);
         } catch (error) {
             console.error("onMount error", error);
         }
@@ -240,6 +239,18 @@
         shadow.appendChild(sidebar);
     }
 
+    function getWindowId() {
+        chrome.runtime.sendMessage({ action: "GET_WINDOW_ID" }, (response) => {
+            if (response && response.windowId !== undefined) {
+                windowId = response.windowId;
+                console.log("windowId", windowId);
+            } else {
+                setTimeout(() => {
+                    getWindowId();
+                }, 200);
+            }
+        });
+    }
     function loadSettings() {
         chrome.storage.local.get(
             [
@@ -262,19 +273,21 @@
                 }
 
                 console.log("settings", settings);
-                chrome.runtime.sendMessage(
-                    { action: "GET_WINDOW_ID" },
-                    (response) => {
-                        console.log("response", response);
-                        if (response && response.windowId !== undefined) {
-                            isPinned =
-                                data?.vtab_settings_pinned_windows?.includes(
-                                    response.windowId,
-                                );
-                            console.log("isPinned", isPinned);
-                        }
-                    },
-                );
+                isPinned = data?.vtab_settings_pinned_windows?.includes(windowId);
+                
+                // chrome.runtime.sendMessage(
+                //     { action: "GET_WINDOW_ID" },
+                //     (response) => {
+                //         console.log("response", response);
+                //         if (response && response.windowId !== undefined) {
+                //             isPinned =
+                //                 data?.vtab_settings_pinned_windows?.includes(
+                //                     response.windowId,
+                //                 );
+                //             console.log("isPinned", isPinned);
+                //         }
+                //     },
+                // );
             },
         );
     }
@@ -313,20 +326,6 @@
         }
     }
 
-    function updateTabList() {
-        chrome.runtime.sendMessage({ action: "GET_WINDOW_ID" }, (response) => {
-            if (response && response.windowId !== undefined) {
-                chrome.storage.local.get(
-                    `tabs_${response.windowId}`,
-                    (data) => {
-                        tabs = data[`tabs_${response.windowId}`];
-                    },
-                );
-            } else {
-                console.error("无法获取窗口ID");
-            }
-        });
-    }
 
     function setSidebarLocal() {
         // 设置侧边栏位置的逻辑...
@@ -386,24 +385,35 @@
         }
         if (changes.vtab_settings_rightSidebar) {
             settings.rightSidebar = changes.vtab_settings_rightSidebar.newValue;
-            console.log(
-                "vtab_settings_rightSidebar changed",
-                settings.rightSidebar,
-            );
-            setSidebarLocal();
+            try {
+                setSidebarLocal();
+            } catch (error) {
+                console.error("setSidebarLocal error", error);
+            }
         }
+
+        if (changes.vtab_settings_pinned_windows) {
+            isPinned = changes.vtab_settings_pinned_windows.newValue.includes(windowId);
+        }
+        if (changes.vtab_settings_scrollSidebar) {
+            const scroll =
+                changes.vtab_settings_scrollSidebar.newValue?.find(
+                    (scroll) => scroll?.windowId === windowId,
+                );
+        }
+
         chrome.runtime.sendMessage({ action: "GET_WINDOW_ID" }, (response) => {
             if (response && response.windowId !== undefined) {
                 console.log("当前窗口的ID是：", response.windowId);
                 // 你可以在这里执行其他操作
-                if (changes.vtab_settings_pinned_windows) {
-                    // console.log('isSidebarPinned changed');
-                    isPinned =
-                        changes.vtab_settings_pinned_windows.newValue.includes(
-                            response.windowId,
-                        );
-                    console.log("isPinned changed", isPinned);
-                }
+                // if (changes.vtab_settings_pinned_windows) {
+                //     // console.log('isSidebarPinned changed');
+                //     isPinned =
+                //         changes.vtab_settings_pinned_windows.newValue.includes(
+                //             response.windowId,
+                //         );
+                //     console.log("isPinned changed", isPinned);
+                // }
                 if (changes.vtab_settings_scrollSidebar) {
                     const scroll =
                         changes.vtab_settings_scrollSidebar.newValue?.find(
@@ -419,29 +429,6 @@
                 console.error("无法获取窗口ID");
             }
         });
-    }
-
-    function handleRuntimeMessages(request, sender, sendResponse) {
-        // 处理运行时消息的逻辑...
-        console.log("Received message:", request);
-        if (request.action === "scrollSidebar") {
-            console.log("Received scrollSidebar message:", request);
-            chrome.runtime.sendMessage(
-                { action: "GET_WINDOW_ID" },
-                (response) => {
-                    // console.log('Received GET_WINDOW_ID response:', response);
-                    if (response && response.windowId !== undefined) {
-                        if (sender.tab.windowId === response.windowId) {
-                            const sidebar =
-                                host.shadowRoot.getElementById("vtab-sidebar");
-                            if (sidebar) {
-                                sidebar.scrollTo(0, request.scrollTop);
-                            }
-                        }
-                    }
-                },
-            );
-        }
     }
 </script>
 
@@ -472,7 +459,9 @@
             })}
     />
 
-    <TabsList {tabs} {searchTerm} />
+    {#if windowId}
+        <TabsList {searchTerm} {windowId}/>
+    {/if}
 
     <Footer />
 </div>
