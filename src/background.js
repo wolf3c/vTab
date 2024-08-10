@@ -15,9 +15,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
     // register content script when extension is updated
     if (details.reason === 'update' || details.reason === 'install') {
         chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }, (windows) => {
-
-            console.log('windows: ', windows)
-
             windows.forEach((window) => {
                 // console.log('window: ', window)
                 window.tabs.filter(tab => tab.status != 'unloaded' && tab.discarded === false).forEach((tab) => {
@@ -44,10 +41,44 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
             Analytics.fireEvent('install&update', { windows_num: windows.length });
         });
-
     }
 });
 
+let settings = {};
+
+function loadSettings() {
+    chrome.storage.local.get(
+        [
+            "vtab_settings_sortUnfreezed",
+            "vtab_settings_sortByHost",
+            "vtab_settings_rightSidebar",
+            "vtab_settings_pinned_windows",
+        ],
+        (data) => {
+            console.log(data);
+            settings.sortUnfreezed =
+                data?.vtab_settings_sortUnfreezed || false;
+            settings.sortByHost = data?.vtab_settings_sortByHost || false;
+            settings.rightSidebar =
+                data?.vtab_settings_rightSidebar || false;
+            // if (settings.rightSidebar) setSidebarLocal();
+            setSidebarLocal();
+
+            chrome.runtime.sendMessage(
+                { action: "GET_WINDOW_ID" },
+                (response) => {
+                    if (response && response.windowId !== undefined) {
+                        isPinned =
+                            data?.vtab_settings_pinned_windows?.includes(
+                                response.windowId,
+                            ) || false;
+                    }
+                },
+            );
+        },
+    );
+}
+loadSettings();
 
 function updateTabsInStorage() {
     console.log('updateTabsInStorage');
@@ -57,15 +88,39 @@ function updateTabsInStorage() {
             // console.log('Tabs updated in storage:', window.id, window.tabs);
             // chrome.storage.local.get('tabs_' + window.id, data => console.log(data))
             const key = 'tabs_' + window.id;
+            let value = sortTabs(window.tabs);
             chrome.storage.local.get(key, (data) => {
                 const storedTabs = data[key];
-                if (JSON.stringify(storedTabs) !== JSON.stringify(window.tabs)) {
-                    chrome.storage.local.set({ [key]: window.tabs });
-                    console.log('Tabs updated in storage:', window.id, window.tabs);
+                if (JSON.stringify(storedTabs) !== JSON.stringify(value)) {
+                    chrome.storage.local.set({ [key]: value });
+                    console.log('Tabs updated in storage:', window.id, value);
                 }
             });
         });
     });
+
+    function sortTabs(tabs) {
+        let activeTabs = [];
+        let freezedTabs = [];
+        if (settings?.sortUnfreezed) {
+            activeTabs = tabs.filter(tab => tab.discarded === false && tab.status !== "unloaded");
+            freezedTabs = tabs.filter(tab => tab.discarded === true || tab.status === "unloaded");
+        } else {
+            activeTabs = tabs;
+        }
+    
+        if (settings?.sortByHost) {
+            activeTabs = sortTabsByHost(activeTabs);
+            freezedTabs = sortTabsByHost(freezedTabs);
+        }
+        return activeTabs.concat(freezedTabs);
+    }
+
+    function sortTabsByHost(tabs) {
+        const hosts = tabs.map(tab => new URL(tab.url).host);
+        const uniqueHosts = [...new Set(hosts)];
+        return tabs.sort((a, b) => uniqueHosts.indexOf(new URL(a.url).host) - uniqueHosts.indexOf(new URL(b.url).host));
+    }
 }
 
 
@@ -85,6 +140,46 @@ chrome.tabs.onAttached.addListener(updateTabsInStorage);
 chrome.windows.onFocusChanged.addListener(updateTabsInStorage);
 chrome.windows.onRemoved.addListener(updateTabsInStorage);
 chrome.windows.onCreated.addListener(updateTabsInStorage);
+
+// // 不能运行content scripts的URL模式列表
+// const restrictedUrlPatterns = [
+//     '^chrome://',
+//     '^chrome-extension://',
+//     '^file://',
+//     '^https?://chrome\.google\.com/webstore',
+//     '^view-source:',
+//     '^about:'
+// ];
+
+// // 检查URL是否匹配受限模式
+// function isRestrictedUrl(url) {
+//     return restrictedUrlPatterns.some(pattern => new RegExp(pattern).test(url));
+// }
+
+// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+//     if (changeInfo.status === 'complete' && isRestrictedUrl(tab.url)) {
+//         // 尝试打开弹出窗口
+//         chrome.action.openPopup().catch(error => {
+//             console.log('无法自动打开弹出窗口:', error);
+//             // 如果无法打开弹出窗口,设置badge提醒用户
+//             chrome.action.setBadgeText({ text: "!", tabId: tabId });
+//             chrome.action.setBadgeBackgroundColor({ color: "#FF0000", tabId: tabId });
+//         });
+//     }
+// });
+
+// // 当标签页激活时,检查是否需要显示badge
+// chrome.tabs.onActivated.addListener((activeInfo) => {
+//     chrome.tabs.get(activeInfo.tabId, (tab) => {
+//         if (isRestrictedUrl(tab.url)) {
+//             chrome.action.setBadgeText({ text: "!", tabId: activeInfo.tabId });
+//             chrome.action.setBadgeBackgroundColor({ color: "#FF0000", tabId: activeInfo.tabId });
+//         } else {
+//             chrome.action.setBadgeText({ text: "", tabId: activeInfo.tabId });
+//         }
+//     });
+// });
+
 
 const autoArchiveDDL = 7 * 24 * 60 * 60 * 1000;
 const autoFreezeDDL = 36 * 60 * 60 * 1000;
@@ -267,5 +362,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         default:
             console.log('messages default')
             break;
+    }
+});
+
+chrome.storage.onChanged.addListener( (changes, namespace) => {
+    console.log('storage onChanged', changes, namespace)
+    if (changes.vtab_settings_sortUnfreezed) {
+        settings.sortUnfreezed =
+            changes.vtab_settings_sortUnfreezed.newValue;
+    }
+    if (changes.vtab_settings_sortByHost) {
+        settings.sortByHost = changes.vtab_settings_sortByHost.newValue;
+    }
+    if (changes.vtab_settings_rightSidebar) {
+        settings.rightSidebar = changes.vtab_settings_rightSidebar.newValue;
+    }
+    if (changes.vtab_settings_pinned_windows) {
+        settings.pinned_windows = changes.vtab_settings_pinned_windows.newValue;
     }
 });

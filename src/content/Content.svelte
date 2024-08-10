@@ -308,36 +308,13 @@
                 chrome.storage.local.get(
                     `tabs_${response.windowId}`,
                     (data) => {
-                        tabs = sortTabs(data[`tabs_${response.windowId}`], tabs);
+                        tabs = data[`tabs_${response.windowId}`];
                     },
                 );
             } else {
                 console.error("无法获取窗口ID");
             }
         });
-    }
-
-    function sortTabs(tabs) {
-        let activeTabs = [];
-        let freezedTabs = [];
-        if (settings?.sortUnfreezed) {
-            activeTabs = tabs.filter(tab => tab.discarded === false && tab.status !== "unloaded");
-            freezedTabs = tabs.filter(tab => tab.discarded === true || tab.status === "unloaded");
-        } else {
-            activeTabs = tabs;
-        }
-
-        if (settings?.sortByHost) {
-            activeTabs = sortTabsByHost(activeTabs);
-            freezedTabs = sortTabsByHost(freezedTabs);
-        }
-        return activeTabs.concat(freezedTabs);
-    }
-
-    function sortTabsByHost(tabs) {
-        const hosts = tabs.map(tab => new URL(tab.url).host);
-        const uniqueHosts = [...new Set(hosts)];
-        return tabs.sort((a, b) => uniqueHosts.indexOf(new URL(a.url).host) - uniqueHosts.indexOf(new URL(b.url).host));
     }
 
     function setSidebarLocal() {
