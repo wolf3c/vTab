@@ -23,14 +23,19 @@
     $: setPinned(isPinned);
 
     onMount(() => {
-        createHost();
-        loadSettings();
-        updateTabList();
-        // togglePin();
-        setTimeout(scrollSidebar, 300);
+        try {
+            createHost();
+            loadSettings();
+            updateTabList();
+            setTimeout(() => {
+                scrollSidebar();
+            }, 300);
 
-        chrome.storage.onChanged.addListener(handleStorageChanges);
-        chrome.runtime.onMessage.addListener(handleRuntimeMessages);
+            chrome.storage.onChanged.addListener(handleStorageChanges);
+            chrome.runtime.onMessage.addListener(handleRuntimeMessages);
+        } catch (error) {
+            console.error("onMount error", error);
+        }
     });
 
     function createHost() {
@@ -250,17 +255,23 @@
                 settings.sortByHost = data?.vtab_settings_sortByHost || false;
                 settings.rightSidebar =
                     data?.vtab_settings_rightSidebar || false;
-                // if (settings.rightSidebar) setSidebarLocal();
-                setSidebarLocal();
+                try {
+                    setSidebarLocal();
+                } catch (error) {
+                    console.error("setSidebarLocal error", error);
+                }
 
+                console.log("settings", settings);
                 chrome.runtime.sendMessage(
                     { action: "GET_WINDOW_ID" },
                     (response) => {
+                        console.log("response", response);
                         if (response && response.windowId !== undefined) {
                             isPinned =
                                 data?.vtab_settings_pinned_windows?.includes(
                                     response.windowId,
-                                ) || false;
+                                );
+                            console.log("isPinned", isPinned);
                         }
                     },
                 );
@@ -320,26 +331,28 @@
     function setSidebarLocal() {
         // 设置侧边栏位置的逻辑...
         console.log("setSidebarLocal right");
-        const sidebar = host.shadowRoot.getElementById("vtab-sidebar");
-        // sidebar.style.removeProperty(settings?.rightSidebar ? "left" : "right");
         sidebar.style[settings?.rightSidebar ? "right" : "left"] = "-240px";
-        // sidebar.style.removeProperty("boxShadow");
         sidebar.style.boxShadow = `${settings?.rightSidebar ? "-" : ""}2px 0 5px rgba(0, 0, 0, 0.2)`;
+
+        try {
+            setPinned(isPinned);
+        } catch (error) {
+            console.error("setPinned error", error);
+        }
     }
 
     function setPinned(isPinned) {
         if (isPinned) {
+            document.body.style.width = "calc(100% - 250px)";
+
             if (settings?.rightSidebar) {
-                document.body.style.width = "calc(100% - 250px)";
+                document.body.style.marginLeft = "0";
             } else {
                 document.body.style.marginLeft = "250px"; // Adjust body margin to make room for sidebar
             }
         } else {
-            if (settings?.rightSidebar) {
-                document.body.style.width = "100%";
-            } else {
-                document.body.style.marginLeft = "0"; // Adjust body margin to make room for sidebar
-            }
+            document.body.style.width = "100%";
+            document.body.style.marginLeft = "0"; // Adjust body margin to make room for sidebar
         }
     }
 
@@ -356,6 +369,7 @@
         } else {
             sidebar.scrollTo(0, scrollTop);
         }
+        return;
     }
 
     function handleStorageChanges(changes, namespace) {
@@ -366,11 +380,9 @@
         if (changes.vtab_settings_sortUnfreezed) {
             settings.sortUnfreezed =
                 changes.vtab_settings_sortUnfreezed.newValue;
-            updateTabList();
         }
         if (changes.vtab_settings_sortByHost) {
             settings.sortByHost = changes.vtab_settings_sortByHost.newValue;
-            updateTabList();
         }
         if (changes.vtab_settings_rightSidebar) {
             settings.rightSidebar = changes.vtab_settings_rightSidebar.newValue;
@@ -384,17 +396,13 @@
             if (response && response.windowId !== undefined) {
                 console.log("当前窗口的ID是：", response.windowId);
                 // 你可以在这里执行其他操作
-                if (changes["tabs_" + response.windowId]) {
-                    updateTabList();
-                }
                 if (changes.vtab_settings_pinned_windows) {
                     // console.log('isSidebarPinned changed');
                     isPinned =
                         changes.vtab_settings_pinned_windows.newValue.includes(
                             response.windowId,
-                        )
-                            ? true
-                            : false;
+                        );
+                    console.log("isPinned changed", isPinned);
                 }
                 if (changes.vtab_settings_scrollSidebar) {
                     const scroll =
