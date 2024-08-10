@@ -61,24 +61,14 @@ function loadSettings() {
             settings.sortByHost = data?.vtab_settings_sortByHost || false;
             settings.rightSidebar =
                 data?.vtab_settings_rightSidebar || false;
-            // if (settings.rightSidebar) setSidebarLocal();
-            setSidebarLocal();
-
-            chrome.runtime.sendMessage(
-                { action: "GET_WINDOW_ID" },
-                (response) => {
-                    if (response && response.windowId !== undefined) {
-                        isPinned =
-                            data?.vtab_settings_pinned_windows?.includes(
-                                response.windowId,
-                            ) || false;
-                    }
-                },
-            );
         },
     );
 }
-loadSettings();
+try {
+    loadSettings();
+} catch (error) {
+    console.error("loadSettings error", error);
+}
 
 function updateTabsInStorage() {
     console.log('updateTabsInStorage');
@@ -376,8 +366,5 @@ chrome.storage.onChanged.addListener( (changes, namespace) => {
     }
     if (changes.vtab_settings_rightSidebar) {
         settings.rightSidebar = changes.vtab_settings_rightSidebar.newValue;
-    }
-    if (changes.vtab_settings_pinned_windows) {
-        settings.pinned_windows = changes.vtab_settings_pinned_windows.newValue;
     }
 });
