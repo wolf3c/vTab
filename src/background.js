@@ -39,7 +39,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
                 })
             });
 
-            Analytics.fireEvent('install&update', { windows_num: windows.length });
+            Analytics.fireEvent('install&update', { value: windows.length });
         });
     }
 });
