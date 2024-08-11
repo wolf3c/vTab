@@ -19,49 +19,8 @@
         });
     }
 
-    // TODO: 待优化
     function togglePin() {
         isPinned = !isPinned;
-        // check if the sidebar is pinned
-        chrome.runtime.sendMessage(
-            { action: "checkSidebarPin" },
-            (response) => {
-                if (response && response.isSidebarPinned !== undefined) {
-                    // console.log('isSidebarPinned response', response)
-                    const isPinned = response.isSidebarPinned;
-                    // console.log('isPinned: ', isPinned)
-
-                    const pinButton =
-                        host.shadowRoot.getElementById("pin-toggle");
-                    pinButton.textContent = isPinned ? "📌 Unpin" : "📌 Pin";
-
-                    const sidebar =
-                        host.shadowRoot.getElementById("vtab-sidebar");
-
-                    if (isPinned) {
-                        sidebar.setAttribute("data-pinned", "true");
-                        sidebar.style[
-                            settings?.rightSidebar ? "right" : "left"
-                        ] = "0";
-                        if (settings?.rightSidebar) {
-                            document.body.style.width = "calc(100% - 250px)";
-                        } else {
-                            document.body.style.marginLeft = "250px"; // Adjust body margin to make room for sidebar
-                        }
-                    } else {
-                        sidebar.setAttribute("data-pinned", "false");
-                        sidebar.style[
-                            settings?.rightSidebar ? "right" : "left"
-                        ] = "-240px";
-                        if (settings?.rightSidebar) {
-                            document.body.style.width = "100%";
-                        } else {
-                            document.body.style.marginLeft = "0"; // Adjust body margin to make room for sidebar
-                        }
-                    }
-                }
-            },
-        );
         chrome.runtime.sendMessage({ action: "toggleSidebarPin" });
         chrome.runtime.sendMessage({
             action: "ga",
