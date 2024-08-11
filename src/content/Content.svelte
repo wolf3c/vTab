@@ -251,6 +251,7 @@
             }
         });
     }
+
     function loadSettings() {
         chrome.storage.local.get(
             [
@@ -393,13 +394,15 @@
         }
 
         if (changes.vtab_settings_pinned_windows) {
-            isPinned = changes.vtab_settings_pinned_windows.newValue.includes(windowId);
+            isPinned =
+                changes.vtab_settings_pinned_windows.newValue.includes(
+                    windowId,
+                );
         }
         if (changes.vtab_settings_scrollSidebar) {
-            const scroll =
-                changes.vtab_settings_scrollSidebar.newValue?.find(
-                    (scroll) => scroll?.windowId === windowId,
-                );
+            const scroll = changes.vtab_settings_scrollSidebar.newValue?.find(
+                (scroll) => scroll?.windowId === windowId,
+            );
         }
 
         chrome.runtime.sendMessage({ action: "GET_WINDOW_ID" }, (response) => {
@@ -460,7 +463,7 @@
     />
 
     {#if windowId}
-        <TabsList {searchTerm} {windowId}/>
+        <TabsList {searchTerm} {windowId} />
     {/if}
 
     <Footer />

@@ -58,6 +58,7 @@
 
 <h1>vTab Extension</h1>
 <div class="settings">
+    <h3>Tabs Sorting</h3>
     <li>
         <label>
             <input
@@ -80,6 +81,7 @@
         </label>
     </li>
     <br />
+    <h3>Layout</h3>
     <li>
         <label>
             <input
@@ -92,6 +94,42 @@
         </label>
     </li>
     <br />
+    <!-- <h3>Interaction</h3>
+    <li>
+        <label>
+            <input
+                type="checkbox"
+                bind:checked={toggleSidebarByKey}
+                on:change={() =>
+                    handleSettingChange("toggleSidebarByKey", toggleSidebarByKey)}
+            />
+            show/hide vTab by <code>shift</code> or <code>Command</code> key
+        </label>
+    </li>
+    <li>
+        <label>
+            <input
+                type="checkbox"
+                bind:checked={openTabsByArrowKey}
+                on:change={() =>
+                    handleSettingChange("openTabsByArrowKey", openTabsByArrowKey)}
+            />
+            open tabs by keyboard <code>↑ ↓</code> and <code>Enter</code>
+        </label>
+    </li>
+    <li>
+        <label>
+            <input
+                type="checkbox"
+                bind:checked={openTabsByVimKey}
+                on:change={() =>
+                    handleSettingChange("openTabsByVimKey", openTabsByVimKey)}
+            />
+            open tabs by VIM mode keyboard: <code>j</code>is ↓, <code>k</code>is ↑, <code>o</code>is new tab, and <code>Enter</code> is open
+        </label>
+    </li>
+    <br> -->
+    <h3>Automation</h3>
     <li>
         <label>
             <input
