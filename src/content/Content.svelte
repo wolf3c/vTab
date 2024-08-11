@@ -57,7 +57,7 @@
         all: initial;
     }
 
-    #sidebar {
+    #vtab-sidebar {
         position: fixed;
         top: 0;
         width: 250px;
@@ -235,7 +235,7 @@
 </style>
 `;
 
-        const sidebar = document.getElementById("sidebar");
+        const sidebar = document.getElementById("vtab-sidebar");
         shadow.appendChild(sidebar);
     }
 
@@ -433,7 +433,7 @@
 </script>
 
 <div
-    id="sidebar"
+    id="vtab-sidebar"
     bind:this={sidebar}
     style={Object.entries(sidebarStyle)
         .map(([key, value]) => `${key}: ${value}`)
