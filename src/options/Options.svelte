@@ -6,9 +6,12 @@
     let rightSidebar = false;
     let autoFreezeSetting = false;
     let autoArchiveSetting = false;
+    let feedback = "";
+
 
     onMount(() => {
         loadSettings();
+
     });
 
     function loadSettings() {
@@ -54,7 +57,21 @@
     function openArchivedManager() {
         chrome.runtime.sendMessage({ action: "openArchivedManager" });
     }
+
+    function sendFeedback() {
+        console.log(feedback);
+        chrome.runtime.sendMessage({
+                    action: "ga",
+                    event: "feedback",
+                    value: feedback,
+                });
+
+        if (confirm("Feedback sent!")) {
+            feedback = "";
+        }
+    }
 </script>
+
 
 <h1>vTab Extension</h1>
 <div class="settings">
@@ -80,7 +97,6 @@
             sort by URL/host
         </label>
     </li>
-    <br />
     <h3>Layout</h3>
     <li>
         <label>
@@ -93,7 +109,6 @@
             show vTab on right
         </label>
     </li>
-    <br />
     <!-- <h3>Interaction</h3>
     <li>
         <label>
@@ -157,15 +172,9 @@
     <li>
         <button on:click={openArchivedManager}>Archived Tabs Manager</button>
     </li>
-</div>
-<div class="footer-btn">
-    <button class="btn" on:click={closeWindow}>Okay</button>
-</div>
-<br />
-<hr />
-<div class="contact-info">
-    <h3>Contact & Feedback</h3>
-    <ul>
+    <hr />
+    <div class="contact-info">
+        <h3>Contact & Feedback</h3>
         <li>
             <a href="https://t.me/+QQLV4RqH4940NjNl" target="_blank"
                 >Telegram Group</a
@@ -177,7 +186,15 @@
         <li>
             <a href="mailto:wolf3c@gmail.com" target="_blank">Email</a>
         </li>
-    </ul>
+        <b>Write your feedback here:</b>
+        <textarea name="" id="" style="width: 100%;" rows="10" bind:value={feedback}></textarea>
+        <br>
+        <button class="btn" on:click={sendFeedback}>Send Feedback</button>
+    </div>
+</div>
+
+<div class="footer-btn">
+    <button class="btn" on:click={closeWindow}>Okay</button>
 </div>
 
 <style>
@@ -198,6 +215,7 @@
         padding: 10px;
         margin-left: 2rem;
         margin-right: 2rem;
+        margin: 0 2rem 5rem 2rem;
         font-size: large;
     }
 
@@ -205,6 +223,24 @@
         padding: 10px 0;
         list-style: none;
         font-size: 1.2rem;
+    }
+
+    .contact-info {
+        padding: 10px;
+        font-size: large;
+    }
+
+    .contact-info li {
+        margin-bottom: 10px;
+    }
+
+    .contact-info a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .contact-info a:hover {
+        text-decoration: underline;
     }
 
     .footer-btn {
@@ -224,23 +260,5 @@
         border: none;
         border-radius: 4px;
         cursor: pointer;
-    }
-
-    .contact-info {
-        padding: 10px;
-        font-size: large;
-    }
-
-    .contact-info li {
-        margin-bottom: 10px;
-    }
-
-    .contact-info a {
-        color: #007bff;
-        text-decoration: none;
-    }
-
-    .contact-info a:hover {
-        text-decoration: underline;
     }
 </style>

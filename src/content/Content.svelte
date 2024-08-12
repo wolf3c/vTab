@@ -4,6 +4,7 @@
     import TabsList from "./TabsList.svelte";
     import OperationArea from "./OperationArea.svelte";
     import Footer from "./Footer.svelte";
+    import Feedback from "./Feedback.svelte";
 
     if (chrome.runtime.getManifest().isReleased) {
         console.log = function () {};
@@ -15,6 +16,7 @@
     let searchTerm = "";
     let sidebar;
     let windowId = null;
+    let isFeedbackAlert = false;
 
     $: sidebarStyle = {
         [settings?.rightSidebar ? "right" : "left"]: isPinned ? "0" : "-240px",
@@ -86,6 +88,33 @@
         cursor: pointer;
     }
     
+    #vtab-feedback {
+        background-color: black;
+        border: none;
+        padding: 5px;
+    }
+    #vtab-feedback-button {
+        background-color: transparent;
+        color: white;
+        padding: 5px;
+        border: none;
+        font-weight: bold;
+        text-decoration: underline;
+        width: calc(100% - 31px);
+        cursor: pointer;
+    }
+    #vtab-feedback-close {
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
+        cursor: pointer;
+        background-color: transparent;
+        color: white;
+        font-weight: 900;
+        border-color: white;
+        border-radius: 50%;
+        border-style: solid;
+    }
     #footer {
         position: fixed;
         bottom: 0;
@@ -235,7 +264,6 @@
 </style>
 `;
 
-        const sidebar = document.getElementById("vtab-sidebar");
         shadow.appendChild(sidebar);
     }
 
@@ -259,6 +287,8 @@
                 "vtab_settings_sortByHost",
                 "vtab_settings_rightSidebar",
                 "vtab_settings_pinned_windows",
+                "vtab_installed_at",
+                "vtab_feedback_alerted_times",
             ],
             (data) => {
                 console.log(data);
@@ -267,15 +297,24 @@
                 settings.sortByHost = data?.vtab_settings_sortByHost || false;
                 settings.rightSidebar =
                     data?.vtab_settings_rightSidebar || false;
+                settings.feedbackAlertedTimes = data?.vtab_feedback_alerted_times || 0;
+                settings.installedAt = data?.vtab_installed_at || null;
+                
                 try {
                     setSidebarLocal();
                 } catch (error) {
                     console.error("setSidebarLocal error", error);
                 }
 
+                try {
+                    setFeedbackAlert(settings.feedbackAlertedTimes, settings.installedAt);
+                } catch (error) {
+                    console.error("setPinned error", error);
+                }
+
                 console.log("settings", settings);
                 // isPinned = data?.vtab_settings_pinned_windows?.includes(windowId);
-                
+
                 chrome.runtime.sendMessage(
                     { action: "GET_WINDOW_ID" },
                     (response) => {
@@ -327,7 +366,6 @@
         }
     }
 
-
     function setSidebarLocal() {
         // 设置侧边栏位置的逻辑...
         console.log("setSidebarLocal right");
@@ -372,6 +410,17 @@
         return;
     }
 
+    function setFeedbackAlert(alertTimes, installedAt) {
+        const ONE_DAY = 1000 * 60 * 60 * 24;
+        if (installedAt &&
+            Date.now() - installedAt >
+            ONE_DAY * 2 ** alertTimes - ONE_DAY
+        ) {
+            isFeedbackAlert = true;
+        } else {
+            isFeedbackAlert = false;
+        }
+    }
     function handleStorageChanges(changes, namespace) {
         // 处理存储变化的逻辑...
         // 向后台脚本发送消息以获取当前窗口 ID
@@ -403,6 +452,10 @@
             const scroll = changes.vtab_settings_scrollSidebar.newValue?.find(
                 (scroll) => scroll?.windowId === windowId,
             );
+        }
+        if (changes.vtab_feedback_alerted_times) {
+            settings.feedbackAlertedTimes = changes.vtab_feedback_alerted_times.newValue;
+            setFeedbackAlert(settings.feedbackAlertedTimes, settings.installedAt);
         }
 
         chrome.runtime.sendMessage({ action: "GET_WINDOW_ID" }, (response) => {
@@ -448,6 +501,10 @@
     data-pinned={isPinned}
 >
     <OperationArea bind:isPinned />
+
+    {#if isFeedbackAlert}
+        <Feedback />
+    {/if}
 
     <input
         id="search-input"

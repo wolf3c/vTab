@@ -40,6 +40,13 @@ chrome.runtime.onInstalled.addListener(function (details) {
             });
 
             Analytics.fireEvent('install&update', { value: windows.length });
+
+            chrome.storage.local.get('vtab_installed_at', (data) => {
+                console.log('vtab_installed_at', data);
+                if (!data?.vtab_installed_at) {
+                    chrome.storage.local.set({ vtab_installed_at: Date.now() });
+                }
+            });
         });
     }
 });
@@ -334,6 +341,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     console.log('Archived tab removed:', request.tabId);
                 });
             })
+            break;
+        case 'closeFeedbackAlert':
+            chrome.storage.local.get('vtab_feedback_alerted_times', (data) => {
+                const times = data?.vtab_feedback_alerted_times || 0;
+                chrome.storage.local.set({ vtab_feedback_alerted_times: times + 1 });
+            });
             break;
         case 'ga':
             console.log('GA:', request?.event, request?.category, request?.action, request?.label, request?.value);
