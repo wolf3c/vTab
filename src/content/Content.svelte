@@ -297,9 +297,10 @@
                 settings.sortByHost = data?.vtab_settings_sortByHost || false;
                 settings.rightSidebar =
                     data?.vtab_settings_rightSidebar || false;
-                settings.feedbackAlertedTimes = data?.vtab_feedback_alerted_times || 0;
+                settings.feedbackAlertedTimes =
+                    data?.vtab_feedback_alerted_times || 0;
                 settings.installedAt = data?.vtab_installed_at || null;
-                
+
                 try {
                     setSidebarLocal();
                 } catch (error) {
@@ -307,7 +308,10 @@
                 }
 
                 try {
-                    setFeedbackAlert(settings.feedbackAlertedTimes, settings.installedAt);
+                    setFeedbackAlert(
+                        settings.feedbackAlertedTimes,
+                        settings.installedAt,
+                    );
                 } catch (error) {
                     console.error("setPinned error", error);
                 }
@@ -412,9 +416,9 @@
 
     function setFeedbackAlert(alertTimes, installedAt) {
         const ONE_DAY = 1000 * 60 * 60 * 24;
-        if (installedAt &&
-            Date.now() - installedAt >
-            ONE_DAY * 2 ** alertTimes - ONE_DAY
+        if (
+            installedAt &&
+            Date.now() - installedAt > ONE_DAY * (2 ** alertTimes - 1)
         ) {
             isFeedbackAlert = true;
         } else {
@@ -454,8 +458,12 @@
             );
         }
         if (changes.vtab_feedback_alerted_times) {
-            settings.feedbackAlertedTimes = changes.vtab_feedback_alerted_times.newValue;
-            setFeedbackAlert(settings.feedbackAlertedTimes, settings.installedAt);
+            settings.feedbackAlertedTimes =
+                changes.vtab_feedback_alerted_times.newValue;
+            setFeedbackAlert(
+                settings.feedbackAlertedTimes,
+                settings.installedAt,
+            );
         }
 
         chrome.runtime.sendMessage({ action: "GET_WINDOW_ID" }, (response) => {
