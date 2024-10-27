@@ -430,14 +430,14 @@
         // 向后台脚本发送消息以获取当前窗口 ID
         console.log("chrome.storage.onChanged: ", changes);
 
-        if (changes.vtab_settings_sortUnfreezed) {
+        if (changes?.vtab_settings_sortUnfreezed) {
             settings.sortUnfreezed =
                 changes.vtab_settings_sortUnfreezed.newValue;
         }
-        if (changes.vtab_settings_sortByHost) {
+        if (changes?.vtab_settings_sortByHost) {
             settings.sortByHost = changes.vtab_settings_sortByHost.newValue;
         }
-        if (changes.vtab_settings_rightSidebar) {
+        if (changes?.vtab_settings_rightSidebar) {
             settings.rightSidebar = changes.vtab_settings_rightSidebar.newValue;
             try {
                 setSidebarLocal();
@@ -446,18 +446,18 @@
             }
         }
 
-        if (changes.vtab_settings_pinned_windows) {
+        if (changes?.vtab_settings_pinned_windows) {
             isPinned =
                 changes.vtab_settings_pinned_windows.newValue.includes(
                     windowId,
                 );
         }
-        if (changes.vtab_settings_scrollSidebar) {
+        if (changes?.vtab_settings_scrollSidebar) {
             const scroll = changes.vtab_settings_scrollSidebar.newValue?.find(
                 (scroll) => scroll?.windowId === windowId,
             );
         }
-        if (changes.vtab_feedback_alerted_times) {
+        if (changes?.vtab_feedback_alerted_times) {
             settings.feedbackAlertedTimes =
                 changes.vtab_feedback_alerted_times.newValue;
             setFeedbackAlert(
@@ -478,7 +478,7 @@
                 //         );
                 //     console.log("isPinned changed", isPinned);
                 // }
-                if (changes.vtab_settings_scrollSidebar) {
+                if (changes?.vtab_settings_scrollSidebar) {
                     const scroll =
                         changes.vtab_settings_scrollSidebar.newValue?.find(
                             (scroll) => scroll?.windowId === response.windowId,

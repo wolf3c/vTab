@@ -1,6 +1,8 @@
 <script>
     export let tab = {};
 
+    console.log("TabItem", tab);
+
     function handleTabClick(tabId) {
         chrome.runtime.sendMessage({ action: "activateTab", tabId });
         chrome.runtime.sendMessage({
