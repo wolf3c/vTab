@@ -1,55 +1,114 @@
 import Analytics from './google-analytics.js';
 
-
+// 禁用掉 console
 if (chrome.runtime.getManifest().isReleased) {
     console.log = function () { };
+};
+
+
+console.log('Background service worker starting...');
+
+const initializeExtension = async () => {
+    console.log('initializeExtension');
+    try {
+        // 获取所有正常窗口
+        const windows = await chrome.windows.getAll({
+            populate: true,
+            windowTypes: ['normal']
+        });
+
+        console.log('initializeExtension - windows: ', windows);
+
+        for (const window of windows) {
+            const activeTabs = window.tabs.filter(tab => {
+                return tab.status === 'complete' &&
+                    !tab.discarded &&
+                    tab.url &&
+                    (tab.url.startsWith('http://') || tab.url.startsWith('https://'));
+            });
+
+            console.log('initializeExtension - activeTabs: ', activeTabs);
+
+            for (const tab of activeTabs) {
+                try {
+                    console.log('Injecting script into tab:', tab?.url);
+
+                    // 首先清理旧的内容
+                    await chrome.scripting.executeScript({
+                        target: { tabId: tab?.id },
+                        func: cleanupOldContent
+                    });
+
+                    // 注入新的脚本
+                    console.log('chrome.runtime.getManifest().content_scripts[0].js: ',tab.id, chrome.runtime.getManifest().content_scripts[0].js);
+                    await chrome.scripting.executeScript({
+                        target: { tabId: tab.id, allFrames : true },
+                        files: chrome.runtime.getManifest().content_scripts[0].js
+                    });
+
+                    console.log(`Script injected successfully in tab ${tab.id}`);
+                } catch (error) {
+                    console.error(`Failed to inject script in tab ${tab.id}:`, error);
+                }
+            }
+        }
+
+        // 记录安装统计
+        await Analytics.fireEvent('install&update', { value: windows.length });
+
+        // 设置安装时间
+        const data = await chrome.storage.local.get('vtab_installed_at');
+        console.log('vtab_installed_at', data);
+        if (!data?.vtab_installed_at) {
+            await chrome.storage.local.set({ vtab_installed_at: Date.now() });
+        }
+
+        return data?.vtab_installed_at;
+    } catch (error) {
+        console.error('Error during extension installation/update:', error);
+    }
+};
+
+const installListener = async (details) => {
+    console.log("Extension event detected:", details);
+
+    if (details.reason !== 'install' && details.reason !== 'update') {
+        return;
+    }
+
+    console.log('Performing delayed initialization');
+
+    try {
+        await initializeExtension();
+    } catch (error) {
+        console.error('Error during extension installation/update:', error);
+    }
+};
+
+
+chrome.runtime.onInstalled.addListener(installListener);
+
+async function checkInstallSetup() {
+    console.log('checkInstallSetup');
+
+    let data = await chrome.storage.local.get('vtab_installed_at');
+    if (!data?.vtab_installed_at) {
+        console.log('Performing delayed initialization');
+        return await initializeExtension('install');
+    } else {
+        return data?.vtab_installed_at;
+    }
 }
 
-
-chrome.runtime.onInstalled.addListener(function (details) {
-    console.log("vtab extension installed.");
-
-
-    // updateTabsInStorage();
-
-    // register content script when extension is updated
-    if (details.reason === 'update' || details.reason === 'install') {
-        chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }, (windows) => {
-            windows.forEach((window) => {
-                // console.log('window: ', window)
-                window.tabs.filter(tab => tab.status != 'unloaded' && tab.discarded === false).forEach((tab) => {
-                    // console.log('chrome.scripting.executeScript - tab: ', tab)
-                    chrome.scripting.executeScript({
-                        target: { tabId: tab.id },
-                        func: () => {
-                            // remove the old content script
-                            let vtabHosts = document.getElementsByClassName('vtab-host')
-                            // console.log(vtabHosts)
-                            while (vtabHosts.length > 0) {
-                                vtabHosts[0].parentNode.removeChild(vtabHosts[0]);
-                            }
-                        }
-                    }).then(() => {
-                        console.log("injected a function")
-                        chrome.scripting.executeScript({
-                            target: { tabId: tab.id },
-                            files: chrome.runtime.getManifest().content_scripts[0].js
-                        });
-                    })
-                })
-            });
-
-            Analytics.fireEvent('install&update', { value: windows.length });
-
-            chrome.storage.local.get('vtab_installed_at', (data) => {
-                console.log('vtab_installed_at', data);
-                if (!data?.vtab_installed_at) {
-                    chrome.storage.local.set({ vtab_installed_at: Date.now() });
-                }
-            });
-        });
+// 清理旧内容的函数
+function cleanupOldContent() {
+    console.log('cleanupOldContent');
+    const vtabHosts = document.getElementsByClassName('vtab-host');
+    for (let host of Array.from(vtabHosts)) {
+        host.parentNode?.removeChild(host);
     }
-});
+}
+
 
 let settings = {};
 
@@ -70,7 +129,8 @@ function loadSettings() {
                 data?.vtab_settings_rightSidebar || false;
         },
     );
-}
+};
+
 try {
     loadSettings();
 } catch (error) {
@@ -105,7 +165,7 @@ function updateTabsInStorage() {
         } else {
             activeTabs = tabs;
         }
-    
+
         if (settings?.sortByHost) {
             activeTabs = sortTabsByHost(activeTabs);
             freezedTabs = sortTabsByHost(freezedTabs);
@@ -227,7 +287,7 @@ function autoArchiveTabs() {
     })
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     console.log('Received message:', request, sender, sendResponse);
     switch (request.action) {
         case 'activateTab':
