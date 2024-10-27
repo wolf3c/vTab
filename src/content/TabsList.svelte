@@ -25,16 +25,18 @@
     function handleStorageChanges(changes, namespace) {
         console.log("TabsList handleStorageChanges", changes, namespace);
 
-        if (changes[`tabs_${windowId}`]) {
+        if (changes?.[`tabs_${windowId}`]) {
             tabs = changes[`tabs_${windowId}`].newValue;
         }
     }
 </script>
 
 <ul id="vtab-list">
-    {#each tabs.filter((tab) => tab.title
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())) as tab (tab.id)}
-        <TabItem {tab} />
-    {/each}
+    {#if tabs?.length > 0}
+        {#each tabs?.filter((tab) => tab?.title
+                ?.toLowerCase()
+                ?.includes(searchTerm.toLowerCase())) as tab (tab.id)}
+            <TabItem {tab} />
+        {/each}
+    {/if}
 </ul>
