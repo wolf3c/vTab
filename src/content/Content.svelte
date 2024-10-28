@@ -43,10 +43,19 @@
         const host = document.createElement("div");
         host.id = "vtab-host";
         host.className = "vtab-host";
+        // 添加 inert 和 aria-hidden 属性
+        host.setAttribute("inert", "");
+        host.setAttribute("aria-hidden", "true");
+
         host.innerHTML = `
 <style>
     .vtab-host {
-    all: initial;
+        all: initial;
+        -webkit-user-select: none;
+        user-select: none;
+        /* 添加以下属性确保内容不被搜索引擎和辅助技术检测到 */
+        speak: none;
+        -webkit-touch-callout: none;
     }
 </style>
 `;
@@ -57,6 +66,15 @@
     /* 重置 Shadow DOM 内部样式，避免继承外部样式 */
     :host {
         all: initial;
+        /* 为所有文本元素添加不可选择属性 */
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    /* 为所有文本元素添加不可选择属性 */
+    #vtab-sidebar, 
+    #vtab-sidebar * {
+        -webkit-user-select: none;
+        user-select: none;
     }
 
     #vtab-sidebar {
