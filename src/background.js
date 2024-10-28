@@ -422,7 +422,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     }
 });
 
-chrome.storage.onChanged.addListener((changes, namespace) => {
+chrome.storage.onChanged.addListener(async (changes, namespace) => {
     console.log('storage onChanged', changes, namespace)
     if (changes.vtab_settings_sortUnfreezed) {
         settings.sortUnfreezed =

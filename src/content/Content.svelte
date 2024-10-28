@@ -24,7 +24,7 @@
 
     $: setPinned(isPinned);
 
-    onMount(() => {
+    onMount(async () => {
         try {
             getWindowId();
             createHost();
