@@ -31,11 +31,11 @@
 </script>
 
 <div id="operation-area">
-    <button on:click={freezeAllTabs}>❅ Freeze All</button>
+    <button on:click={freezeAllTabs}><span inert aria-hidden='true'>❅ Freeze All</span></button>
     <button on:click={addNewTab} style="font-weight: bolder; border: solid;"
-        >+</button
+        ><span inert aria-hidden='true'>+</span></button
     >
     <button id="pin-toggle" on:click={togglePin}>
-        📌 {isPinned ? "Unpin" : "Pin"}
+        <span inert aria-hidden='true'>📌 {isPinned ? "Unpin" : "Pin"}</span>
     </button>
 </div>

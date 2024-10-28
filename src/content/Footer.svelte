@@ -30,7 +30,7 @@
 </script>
 
 <div id="footer">
-    <button on:click={openGithub}>🏚️ Github</button>
-    <button on:click={openArchivedManager}>🗄️ Archived</button>
-    <button on:click={openSettings}>⚙️ Settings</button>
+    <button on:click={openGithub}><span inert aria-hidden='true'>🏚️ Github</span></button>
+    <button on:click={openArchivedManager}><span inert aria-hidden='true'>🗄️ Archived</span></button>
+    <button on:click={openSettings}><span inert aria-hidden='true'>⚙️ Settings</span></button>
 </div>

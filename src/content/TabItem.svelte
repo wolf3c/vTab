@@ -43,7 +43,7 @@
         on:click={() => handleTabClick(tab.id)}
     >
         <img src={tab.favIconUrl} alt="Favicon" />
-        <span>{tab.title.length === 0 ? tab.pendingUrl : tab.title}</span>
+        <span inert aria-hidden='true'>{tab.title.length === 0 ? tab.pendingUrl : tab.title}</span>
         <button class="close-button" on:click={(e) => closeTab(tab.id, e)}
             >X</button
         >

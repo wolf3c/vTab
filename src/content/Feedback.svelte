@@ -16,6 +16,6 @@
 </script>
 
 <div id="vtab-feedback">
-    <button id="vtab-feedback-button" on:click={openFeedback}>Feedback & Suggestions</button>
-    <button id="vtab-feedback-close" on:click={closeFeedback}>X</button>
+    <button id="vtab-feedback-button" on:click={openFeedback}><span inert aria-hidden='true'>Feedback & Suggestions</span></button>
+    <button id="vtab-feedback-close" on:click={closeFeedback}><span inert aria-hidden='true'>X</span></button>
 </div>
