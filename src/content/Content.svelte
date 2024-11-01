@@ -515,8 +515,6 @@
     {/if}
 
     <input
-        inert
-        aria-hidden="true"
         id="search-input"
         type="text"
         placeholder="Search tabs..."
