@@ -194,16 +194,22 @@
     }
     .vtab-list-item button {
         position: absolute;
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
+        font-size: 18px;
         cursor: pointer;
         background-color: black;
         color: white;
-        border: none;
+        border: solid black;
         border-radius: 50%;
         top: 50%;
         transform: translateY(-50%);
         display: none;
+        padding: 0;
+        box-shadow: 0 0 5px #777777;
+        &:hover {
+            box-shadow: 0 0 10px #444;
+        }
     }
 
     .vtab-list-item:hover button {
