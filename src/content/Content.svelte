@@ -5,6 +5,7 @@
     import OperationArea from "./OperationArea.svelte";
     import Footer from "./Footer.svelte";
     import Feedback from "./Feedback.svelte";
+    import Search from "./Search.svelte";
 
     if (chrome.runtime.getManifest().isReleased) {
         console.log = function () {};
@@ -17,10 +18,13 @@
     let sidebar;
     let windowId = null;
     let isFeedbackAlert = false;
+    let tabGroupSelectedId = -1;
 
     $: sidebarStyle = {
         [settings?.rightSidebar ? "right" : "left"]: isPinned ? "0" : "-240px",
     };
+
+
 
     $: setPinned(isPinned);
 
@@ -137,6 +141,21 @@
         width: 100%;
         padding: 10px;
         box-sizing: border-box;
+        & input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 5px;
+            margin: 5px 0;
+        }
+        & .search-tabGroups-filters {
+            border-radius: 1rem;
+            padding: 2px 10px;
+            margin: 0 3px;
+            &.active {
+                background-color: black;
+                color: white;
+            }
+        }
     }
 
     #vtab-list {
@@ -520,21 +539,11 @@
         <Feedback />
     {/if}
 
-    <input
-        id="search-input"
-        type="text"
-        placeholder="Search tabs..."
-        bind:value={searchTerm}
-        on:focus={() =>
-            chrome.runtime.sendMessage({
-                action: "ga",
-                event: "search",
-                label: "sidebar_operation",
-            })}
-    />
+
+    <Search bind:searchTerm {windowId} bind:tabGroupSelectedId/>
 
     {#if windowId}
-        <TabsList {searchTerm} {windowId} />
+        <TabsList {searchTerm} {windowId} {tabGroupSelectedId}/>
     {/if}
 
     <Footer />

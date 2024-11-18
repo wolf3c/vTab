@@ -63,6 +63,9 @@ const initializeExtension = async () => {
             await chrome.storage.local.set({ vtab_installed_at: Date.now() });
         }
 
+        // 获取 tab groups 信息
+        fetchTabGroups();
+
         return data?.vtab_installed_at;
     } catch (error) {
         console.error('Error during extension installation/update:', error);
@@ -197,6 +200,17 @@ chrome.tabs.onAttached.addListener(updateTabsInStorage);
 chrome.windows.onFocusChanged.addListener(updateTabsInStorage);
 chrome.windows.onRemoved.addListener(updateTabsInStorage);
 chrome.windows.onCreated.addListener(updateTabsInStorage);
+
+function fetchTabGroups() {
+    console.log('fetchTabGroups')
+    chrome.tabGroups.query({}, (groups) => {
+        console.log("Tab Groups:", groups);
+        chrome.storage.local.set({tabGroups: groups})
+    });
+}
+chrome.tabGroups.onCreated.addListener(fetchTabGroups)
+chrome.tabGroups.onRemoved.addListener(fetchTabGroups)
+chrome.tabGroups.onUpdated.addListener(fetchTabGroups)
 
 // // 不能运行content scripts的URL模式列表
 // const restrictedUrlPatterns = [

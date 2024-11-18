@@ -5,6 +5,14 @@
     let tabs = [];
     export let windowId = null;
     export let searchTerm = "";
+    export let tabGroupSelectedId = -1;
+
+    let tabsFilterResult = [];
+    $: tabsFilterResult = tabs
+        ?.filter((tab) =>
+            tab?.title?.toLowerCase()?.includes(searchTerm.toLowerCase()),
+        )
+        ?.filter( t => tabGroupSelectedId > 0 ? t.groupId === tabGroupSelectedId : true);
 
     onMount(() => {
         try {
@@ -33,9 +41,7 @@
 
 <ul id="vtab-list">
     {#if tabs?.length > 0}
-        {#each tabs?.filter((tab) => tab?.title
-                ?.toLowerCase()
-                ?.includes(searchTerm.toLowerCase())) as tab (tab.id)}
+        {#each tabsFilterResult as tab (tab.id)}
             <TabItem {tab} />
         {/each}
     {/if}
