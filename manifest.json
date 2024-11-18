@@ -5,6 +5,7 @@
     "version": "4.9",
     "permissions": [
         "tabs",
+        "tabGroups",
         "storage",
         "activeTab",
         "scripting"
