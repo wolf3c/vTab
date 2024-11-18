@@ -4,7 +4,7 @@
     export let windowId;
     export let searchTerm;
     export let tabGroupSelectedId;
-    
+
     let isSearchFocused = false;
     let isComponentFocused = false;
 
@@ -28,11 +28,20 @@
     });
 
     function groupSelect(id) {
-        tabGroupSelectedId = tabGroupSelectedId === id ? -1 : id
+        tabGroupSelectedId = tabGroupSelectedId === id ? -1 : id;
+        chrome.runtime.sendMessage({
+            action: "ga",
+            event: "tabGroupsFilterClick",
+            label: "",
+        });
     }
 </script>
 
-<div id="search-input" on:mouseenter={() => isComponentFocused = true} on:mouseleave={() => isComponentFocused = false}>
+<div
+    id="search-input"
+    on:mouseenter={() => (isComponentFocused = true)}
+    on:mouseleave={() => (isComponentFocused = false)}
+>
     <input
         type="text"
         placeholder="Search tabs..."
@@ -43,22 +52,24 @@
                 action: "ga",
                 event: "search",
                 label: "sidebar_operation",
-            })}
-        }
+            });
+        }}
         on:blur={() => {
             isSearchFocused = false;
         }}
-            
     />
 
     {#if isComponentFocused || isSearchFocused || searchTerm?.length || tabGroupSelectedId > 0}
-    <div>
-        {#each tabGroups.filter(g => g.windowId === windowId) as g (g.id)}
-            <button class="search-tabGroups-filters {tabGroupSelectedId === g.id ? 'active' : ''}"
-                style="border-color: {g.color};"
-                on:click={() => groupSelect(g.id)}>{g.title}</button
-            >
-        {/each}
-    </div>
+        <div>
+            {#each tabGroups.filter((g) => g.windowId === windowId) as g (g.id)}
+                <button
+                    class="search-tabGroups-filters {tabGroupSelectedId === g.id
+                        ? 'active'
+                        : ''}"
+                    style="border-color: {g.color};"
+                    on:click={() => groupSelect(g.id)}>{g.title}</button
+                >
+            {/each}
+        </div>
     {/if}
 </div>
