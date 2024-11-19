@@ -227,7 +227,7 @@
         padding: 0;
         box-shadow: 0 0 5px #777777;
         &:hover {
-            box-shadow: 0 0 10px #444;
+            border-radius: 6px;
         }
     }
 
