@@ -67,7 +67,7 @@
                         ? 'active'
                         : ''}"
                     style="border-color: {g.color};"
-                    on:click={() => groupSelect(g.id)}>{g.title}</button
+                    on:click={() => groupSelect(g.id)}><span class="icon">🏷️</span> {g.title}</button
                 >
             {/each}
         </div>

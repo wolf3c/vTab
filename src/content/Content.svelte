@@ -146,14 +146,21 @@
             box-sizing: border-box;
             padding: 5px;
             margin: 5px 0;
+            border-style: solid;
         }
         & .search-tabGroups-filters {
             border-radius: 1rem;
             padding: 2px 10px;
             margin: 0 3px;
+            & .icon {
+                display: none;
+            }
             &.active {
                 background-color: black;
                 color: white;
+                & .icon {
+                    display: unset;
+                }
             }
         }
     }
@@ -258,8 +265,19 @@
         }
 
         #search-input {
-            background-color: #666; /* Dark background color for search input */
-            color: #f7f7f7; /* Light text color */
+            & input {
+                background-color: #444;
+                color: #f7f7f7;
+                &::placeholder {
+                    color: #f7f7f7;
+                }
+            }
+            & .search-tabGroups-filters {
+                &.active {
+                    background-color: white;
+                    color: black;
+                }
+            }
         }
 
         .vtab-list-item {
@@ -277,8 +295,9 @@
         }
 
         .vtab-list-item button {
-            background-color: white; /* Button background color */
-            color: black; /* Button text color */
+            background-color: white;
+            color: black;
+            border-color: white; 
         }
         .vtab-list-item.discarded {
             img, span {
