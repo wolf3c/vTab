@@ -57,8 +57,28 @@ There are three reasons why I develop this Chrome extension:
 3. finally, AI empowered my technique. I asked GPT build the first version of vTab in 1hour 52mins.
 
 # Q&A
+### 1. What permissions are required and why those permissions are needed? || 需要哪些权限以及为什么需要那些权限？
 
-### 1. 为什么弹出「增强型安全浏览功能不信任此扩展程序」提醒？应该如何处理？
+**The permissions are required and why**:
+- tabs : to know the tabs you opened, and manage tabs (check, switch, freeze, close, new, search, etc.); 
+- tabGroups : to filter tabs by tab groups;
+- activeTab : to know currently active tab you are using;
+- storage : to save settings and data of vTab;
+- scripting : to inject the vTab in your tabs when installed;
+
+**Data security statement: All your personal data and content browsed are NOT uploaded or saved in the cloud.**
+
+`Chinese version:`
+**权限及用途**：
+- tabs : 用于读取你打开的标签页及管理各个标签页 （查看、切换、冻结、关闭、新建、搜索…）; 
+- tabGroups : 用于按标签组过滤的功能;
+- activeTab : 用于你当前正使用的标签页;
+- storage : 用于本地保存 vTab 的设置项和其他数据;
+- scripting : 用于在安装后将 vTab 显示在你的各个标签页中;
+
+**数据安全申明：你的所有个人数据和浏览内容均没有上传或保存在云端。**
+
+### 2. 为什么弹出「增强型安全浏览功能不信任此扩展程序」提醒？应该如何处理？
 ![增强型安全浏览功能不信任此扩展程序](images/alert.png)
 
 因为我是一个新的 Chrome extension 开发人员，[还没有被列入 **Chrome Web Store 开发人员计划政策**](https://pcservices.com.my/2021/06/06/google-chrome-%E7%8E%B0%E5%9C%A8%E8%AD%A6%E5%91%8A%E7%94%A8%E6%88%B7%E6%9D%A5%E8%87%AA%E4%B8%8D%E5%8F%97%E4%BF%A1%E4%BB%BB%E5%BC%80%E5%8F%91%E8%80%85%E7%9A%84%E6%89%A9%E5%B1%95%E7%A8%8B%E5%BA%8F/)，我所开发的所有插件都会出现此弹窗以提醒用户谨慎使用，但这并不代表 vTab 有问题，vTab 所有代码开源，欢迎监督，并且也有很多前端开发人员在使用 vTab，**没有任何秘密代码，请放心使用**。
