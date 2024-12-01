@@ -1,5 +1,6 @@
 <script>
     export let tab = {};
+    let title = tab.title.length === 0 ? tab.pendingUrl : tab.title;
 
     console.log("TabItem", tab);
 
@@ -41,9 +42,10 @@
             : ''} {tab.active ? 'active' : ''}"
         data-tab-id={tab.id}
         on:click={() => handleTabClick(tab.id)}
+        title={title + '\n\n' + tab?.url?.split("?")[0]}
     >
         <img src={tab.favIconUrl} alt="Favicon" />
-        <span inert aria-hidden='true'>{tab.title.length === 0 ? tab.pendingUrl : tab.title}</span>
+        <span inert aria-hidden='true'>{title}</span>
         <button class="close-button" on:click={(e) => closeTab(tab.id, e)}
             >X</button
         >
