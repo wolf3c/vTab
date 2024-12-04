@@ -1,6 +1,7 @@
 <script>
     export let tab = {};
-    let title = tab.title.length === 0 ? tab.pendingUrl : tab.title;
+    let title = "";
+    $: title = tab.title.length === 0 ? tab.pendingUrl : tab.title;
 
     console.log("TabItem", tab);
 
