@@ -17,6 +17,7 @@
     let searchTerm = "";
     let sidebar;
     let windowId = null;
+    let thisTabId = null;
     let isFeedbackAlert = false;
     let tabGroupSelectedId = -1;
 
@@ -315,6 +316,7 @@
         chrome.runtime.sendMessage({ action: "GET_WINDOW_ID" }, (response) => {
             if (response && response.windowId !== undefined) {
                 windowId = response.windowId;
+                thisTabId = response.tabId;
                 console.log("windowId", windowId);
             } else {
                 setTimeout(() => {
@@ -509,34 +511,20 @@
                 settings.installedAt,
             );
         }
+        if (changes?.vtab_settings_scrollSidebar) {
+            console.log("changes.vtab_settings_scrollSidebar", changes.vtab_settings_scrollSidebar, thisTabId);
+            const scroll =
+                changes.vtab_settings_scrollSidebar.newValue?.find(
+                    (scroll) => scroll?.windowId === windowId,
+                );
 
-        chrome.runtime.sendMessage({ action: "GET_WINDOW_ID" }, (response) => {
-            if (response && response.windowId !== undefined) {
-                console.log("当前窗口的ID是：", response.windowId);
-                // 你可以在这里执行其他操作
-                // if (changes.vtab_settings_pinned_windows) {
-                //     // console.log('isSidebarPinned changed');
-                //     isPinned =
-                //         changes.vtab_settings_pinned_windows.newValue.includes(
-                //             response.windowId,
-                //         );
-                //     console.log("isPinned changed", isPinned);
-                // }
-                if (changes?.vtab_settings_scrollSidebar) {
-                    const scroll =
-                        changes.vtab_settings_scrollSidebar.newValue?.find(
-                            (scroll) => scroll?.windowId === response.windowId,
-                        );
+            console.log("scroll: ", scroll);
 
-                    if (scroll?.tabId !== response.tabId) {
-                        console.log("scrollSidebar changed", scroll?.scrollTop);
-                        scrollSidebar(scroll?.scrollTop);
-                    }
-                }
-            } else {
-                console.error("无法获取窗口ID");
+            if (scroll?.tabId !== thisTabId) {
+                console.log("scrollSidebar changed", scroll?.scrollTop);
+                scrollSidebar(scroll?.scrollTop);
             }
-        });
+        }
     }
 </script>
 
